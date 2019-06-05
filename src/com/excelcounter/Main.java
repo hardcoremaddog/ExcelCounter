@@ -6,8 +6,13 @@ public class Main {
 //	private File all;
 //	private File table;
 
-	private final File all = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\!Укомплектованность оперативных планов\\!765\\2019\\05.Май\\test\\full.xlsx");
-	private final File table = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\!Укомплектованность оперативных планов\\!765\\2019\\05.Май\\test\\[765] Сводная таблица [29.05.19].xlsx");
+	//work
+//	private final File all = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\!Укомплектованность оперативных планов\\!765\\2019\\05.Май\\test\\full.xlsx");
+//	private final File table = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\!Укомплектованность оперативных планов\\!765\\2019\\05.Май\\test\\[765] Сводная таблица [29.05.19].xlsx");
+
+	//home
+	private final File all = new File("D:\\1\\all.xlsx");
+	private final File table = new File("D:\\1\\table.xlsx");
 
 	public static void main(String[] args) throws IOException {
 

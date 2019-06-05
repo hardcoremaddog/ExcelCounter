@@ -1,11 +1,9 @@
 package com.excelcounter;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,7 +14,8 @@ public class CellsCounter {
 	private File all;
 	private File table;
 
-	private ArrayList<Carriage> listOfCarriages = new ArrayList<>();
+	private ArrayList<Carriage> carriages = new ArrayList<>();
+	private ArrayList<Integer> values = new ArrayList<>();
 
 	public CellsCounter(File all, File table) {
 		this.all = all;
@@ -53,7 +52,6 @@ public class CellsCounter {
 
 	public void run() {
 		readMain(all, table);
-
 	}
 
 	private void readMain(File all, File table) {
@@ -75,8 +73,8 @@ public class CellsCounter {
 							String carriageName = cell.getStringCellValue();
 							Carriage carriage = new Carriage(carriageName);
 							System.out.println(cell.getStringCellValue() + "\n");
-							identifyColumn(cell.getColumnIndex(), allSheet, carriage);
-							listOfCarriages.add(carriage);
+							readColumn(cell.getColumnIndex(), allSheet, carriage);
+							carriages.add(carriage);
 							System.out.println("*********************");
 						}
 					}
@@ -90,97 +88,44 @@ public class CellsCounter {
 		}
 	}
 
-	private void identifyColumn(int columnNum, XSSFSheet sheet, Carriage carriage) {
-		for (Row row : sheet) {
-			Cell firstCell = row.getCell(0);
-
-			switch (firstCell.getCellType()) {
-				case STRING: {
-					switch (firstCell.getStringCellValue()) {
-						case UVK: {
-							System.out.println(UVK);
-							readColumn(columnNum, sheet, carriage);
-							break;
-						}
-						case OMO: {
-							System.out.println(OMO);
-							break;
-						}
-						case OMZK: {
-							System.out.println(OMZK);
-							break;
-						}
-
-						case MMZ02: {
-							System.out.println(MMZ02);
-							break;
-						}
-
-						case TSEH_5: {
-							System.out.println(TSEH_5);
-							break;
-						}
-
-						case TSEH_10: {
-							System.out.println(TSEH_10);
-							break;
-						}
-
-						case TSEH_51: {
-							System.out.println(TSEH_51);
-							break;
-						}
-
-						case TSEH_121: {
-							System.out.println(TSEH_121);
-							break;
-						}
-
-						case TSEH_217: {
-							System.out.println(TSEH_217);
-							break;
-						}
-
-						case TSEH_317: {
-							System.out.println(TSEH_317);
-							break;
-						}
-
-						case TSEH_416: {
-							System.out.println(TSEH_416);
-							break;
-						}
-
-						case TSEH_517: {
-							System.out.println(TSEH_517);
-							break;
-						}
-
-						case VVMMZ: {
-							System.out.println("ВВМЗ");
-							break;
-						}
-
-					}
-				}
-			}
-		}
-	}
-
 	private void readColumn(int columnNum, XSSFSheet sheet, Carriage carriage) {
 		int rowNum = 0;
 		int count = 0;
 		for (Row row : sheet) {
 			Cell cell = row.getCell(columnNum);
-			if (rowNum != 0) {
-				if (cell.getCellType() == CellType.BLANK) {
-					break;
-				}
-				count++;
+			XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
+			XSSFFont font = cs.getFont();
+
+			byte[] redRBG = new byte[] {(byte) 255, (byte) 192, (byte) 203};
+			byte[] yellowRGB = new byte[] {(byte) 255, (byte) 236, (byte) 139};
+
+			if (font.getBold() && font.getFontHeightInPoints() == 8) {
+				System.out.println(row.getCell(0));
+				System.out.println(count(rowNum, columnNum, sheet));
 			}
 			rowNum++;
 		}
+//		System.out.println("Количество строк: " + count + "\n");
+	}
 
-		System.out.println("Количество строк: " + count);
+	private int count(int rowNum, int columnNum, XSSFSheet sheet) {
+		int currentRowNum = 0;
+		int count = 0;
+		for (Row row : sheet) {
+			if (currentRowNum <= rowNum) {
+				currentRowNum++;
+				continue;
+			}
+
+			Cell cell = row.getCell(columnNum);
+			XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
+			XSSFFont font = cs.getFont();
+
+			if (font.getBold() && font.getFontHeightInPoints() == 8) {
+				return count;
+			}
+			count++;
+		}
+		return 0;
 	}
 }
