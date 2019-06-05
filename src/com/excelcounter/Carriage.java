@@ -9,9 +9,6 @@ public class Carriage {
 	}
 
 
-
-
-
 	private int TSEH_5_redCellsCount = 0;
 	private int TSEH_10_redCellsCount = 0;
 	private int TSEH_51_redCellsCount = 0;

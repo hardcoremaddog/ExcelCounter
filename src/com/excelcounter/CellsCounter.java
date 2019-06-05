@@ -75,7 +75,7 @@ public class CellsCounter {
 							String carriageName = cell.getStringCellValue();
 							Carriage carriage = new Carriage(carriageName);
 							System.out.println(cell.getStringCellValue() + "\n");
-							readColumn(cell.getColumnIndex(), allSheet, carriage);
+							identifyColumn(cell.getColumnIndex(), allSheet, carriage);
 							listOfCarriages.add(carriage);
 							System.out.println("*********************");
 						}
@@ -90,19 +90,16 @@ public class CellsCounter {
 		}
 	}
 
-	private void readColumn(int columnNum, XSSFSheet sheet, Carriage carriage) {
+	private void identifyColumn(int columnNum, XSSFSheet sheet, Carriage carriage) {
 		for (Row row : sheet) {
 			Cell firstCell = row.getCell(0);
-			Cell cell = row.getCell(columnNum);
+
 			switch (firstCell.getCellType()) {
 				case STRING: {
 					switch (firstCell.getStringCellValue()) {
-						case "91389":{
-							System.out.println("PEZDA");
-						}
-
 						case UVK: {
 							System.out.println(UVK);
+							readColumn(columnNum, sheet, carriage);
 							break;
 						}
 						case OMO: {
@@ -160,7 +157,7 @@ public class CellsCounter {
 						}
 
 						case VVMMZ: {
-							System.out.println(VVMMZ);
+							System.out.println("ВВМЗ");
 							break;
 						}
 
@@ -168,5 +165,22 @@ public class CellsCounter {
 				}
 			}
 		}
+	}
+
+	private void readColumn(int columnNum, XSSFSheet sheet, Carriage carriage) {
+		int rowNum = 0;
+		int count = 0;
+		for (Row row : sheet) {
+			Cell cell = row.getCell(columnNum);
+			if (rowNum != 0) {
+				if (cell.getCellType() == CellType.BLANK) {
+					break;
+				}
+				count++;
+			}
+			rowNum++;
+		}
+
+		System.out.println("Количество строк: " + count);
 	}
 }
