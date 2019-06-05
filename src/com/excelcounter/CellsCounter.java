@@ -101,16 +101,17 @@ public class CellsCounter {
 
 			if (font.getBold() && font.getFontHeightInPoints() == 8) {
 				System.out.println(row.getCell(0));
-				System.out.println(count(rowNum, columnNum, sheet));
+				count(rowNum, columnNum, sheet);
 			}
 			rowNum++;
 		}
 //		System.out.println("Количество строк: " + count + "\n");
 	}
 
-	private int count(int rowNum, int columnNum, XSSFSheet sheet) {
+	private void count(int rowNum, int columnNum, XSSFSheet sheet) {
 		int currentRowNum = 0;
-		int count = 0;
+		int redCells = 0;
+		int yellowCells = 0;
 		for (Row row : sheet) {
 			if (currentRowNum <= rowNum) {
 				currentRowNum++;
@@ -121,11 +122,13 @@ public class CellsCounter {
 			XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
 			XSSFFont font = cs.getFont();
 
+
 			if (font.getBold() && font.getFontHeightInPoints() == 8) {
-				return count;
+				System.out.println("К: " + redCells);
+				System.out.println("Ж: " + yellowCells);
+				System.out.println("---------------------");
+				return;
 			}
-			count++;
 		}
-		return 0;
 	}
 }
