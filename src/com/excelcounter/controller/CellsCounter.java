@@ -68,7 +68,13 @@ public class CellsCounter {
 			for (Row row : allSheet) {
 				for (Cell cell : row) {
 					if (cell.getCellType() == CellType.STRING) {
-						if (cell.getStringCellValue().startsWith("(") || cell.getStringCellValue().startsWith("16")) {
+						if (cell.getStringCellValue().startsWith("(")
+								|| cell.getStringCellValue().startsWith("16")
+								|| cell.getStringCellValue().startsWith("17")
+								|| cell.getStringCellValue().startsWith("18")
+								|| cell.getStringCellValue().startsWith("19")
+								|| cell.getStringCellValue().startsWith("20")
+								|| cell.getStringCellValue().startsWith("21")) {
 							String orderNumber = cell.getStringCellValue();
 							Order order = new Order(orderNumber);
 							readColumn(cell.getColumnIndex(), allSheet, order);
