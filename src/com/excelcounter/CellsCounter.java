@@ -3,7 +3,6 @@ package com.excelcounter;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,29 +11,13 @@ import java.util.ArrayList;
 public class CellsCounter {
 
 	private File all;
-	private File table;
 
-	private ArrayList<Carriage> carriages = new ArrayList<>();
+	private ArrayList<Order> orders = new ArrayList<>();
 	private ArrayList<Integer> values = new ArrayList<>();
 
-	public CellsCounter(File all, File table) {
+	public CellsCounter(File all) {
 		this.all = all;
-		this.table = table;
 	}
-
-	private final String TSEH_5 = "Сварочно - сборочный цех № 5";
-	private final String TSEH_10 = "Электромонтажный цех № 10";
-	private final String TSEH_51 = "Цех инструмента и оснастки № 51";
-	private final String TSEH_121 = "Прессово-заготовительный цех № 121";
-	private final String TSEH_217 = "Вагоносборочный цех № 217";
-	private final String TSEH_317 = "Цех по сборке тележек и кузовов  № 317";
-	private final String TSEH_416 = "Механосборочный  цех № 416";
-	private final String TSEH_517 = "Цех окраски вагонов № 517";
-	private final String VVMMZ = "Производственный участок";
-	private final String UVK = "Управление внешней комплектации";
-	private final String OMZK = "Отдел межзаводской кооперации";
-	private final String OMO = "Отдел материального обеспечения";
-	private final String MMZ02 = "02ММЗ ММЗ Цех 02";
 
 	private int TSEH_5_redCellsCount = 0;
 	private int TSEH_10_redCellsCount = 0;
@@ -51,30 +34,25 @@ public class CellsCounter {
 	private int MMZ02_redCellsCount = 0;
 
 	public void run() {
-		readMain(all, table);
+		readMain(all);
 	}
 
-	private void readMain(File all, File table) {
+	private void readMain(File all) {
 		try {
 			FileInputStream allFileInputStream = new FileInputStream(all);
-			FileInputStream tableFileInputStream = new FileInputStream(table);
-
 			XSSFWorkbook allWorkBook = new XSSFWorkbook(allFileInputStream);
-			XSSFWorkbook tableWorkBook = new XSSFWorkbook(tableFileInputStream);
-
 			XSSFSheet allSheet = allWorkBook.getSheetAt(0);
-			XSSFSheet tableSheet = allWorkBook.getSheetAt(0);
 
 			System.out.println("*********************");
 			for (Row row : allSheet) {
 				for (Cell cell : row) {
 					if (cell.getCellType() == CellType.STRING) {
-						if (cell.getStringCellValue().startsWith("(")) {
-							String carriageName = cell.getStringCellValue();
-							Carriage carriage = new Carriage(carriageName);
+						if (cell.getStringCellValue().startsWith("(") || cell.getStringCellValue().startsWith("16")) {
+							String orderNumber = cell.getStringCellValue();
+							Order order = new Order(orderNumber);
 							System.out.println(cell.getStringCellValue() + "\n");
-							readColumn(cell.getColumnIndex(), allSheet, carriage);
-							carriages.add(carriage);
+							readColumn(cell.getColumnIndex(), allSheet, order);
+							orders.add(order);
 							System.out.println("*********************");
 						}
 					}
@@ -82,51 +60,51 @@ public class CellsCounter {
 			}
 
 			allFileInputStream.close();
-			tableFileInputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void readColumn(int columnNum, XSSFSheet sheet, Carriage carriage) {
-		int rowNum = 0;
-		int count = 0;
-		for (Row row : sheet) {
+	private void readColumn(int columnNum, XSSFSheet sheet, Order order) {
+		for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
+			Row row = sheet.getRow(rowNum);
 			Cell cell = row.getCell(columnNum);
 			XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
 			XSSFFont font = cs.getFont();
-
-			byte[] redRBG = new byte[] {(byte) 255, (byte) 192, (byte) 203};
-			byte[] yellowRGB = new byte[] {(byte) 255, (byte) 236, (byte) 139};
 
 			if (font.getBold() && font.getFontHeightInPoints() == 8) {
 				System.out.println(row.getCell(0));
-				count(rowNum, columnNum, sheet);
+				count(rowNum, columnNum, sheet, order);
 			}
-			rowNum++;
 		}
-//		System.out.println("Количество строк: " + count + "\n");
 	}
 
-	private void count(int rowNum, int columnNum, XSSFSheet sheet) {
-		int currentRowNum = 0;
-		int redCells = 0;
-		int yellowCells = 0;
-		for (Row row : sheet) {
-			if (currentRowNum <= rowNum) {
-				currentRowNum++;
-				continue;
-			}
-
+	private void count(int rowNum, int columnNum, XSSFSheet sheet, Order order) {
+		int redCount = 0;
+		int yellowCount = 0;
+		for (int currentRowNum = rowNum + 1; currentRowNum < sheet.getPhysicalNumberOfRows(); currentRowNum++) {
+			Row row = sheet.getRow(currentRowNum);
 			Cell cell = row.getCell(columnNum);
+
 			XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
 			XSSFFont font = cs.getFont();
 
+			String redARGBHEX = "FFFFC0CB";
+			String yellowARGBHEX = "FFFFEC8B";
 
-			if (font.getBold() && font.getFontHeightInPoints() == 8) {
-				System.out.println("К: " + redCells);
-				System.out.println("Ж: " + yellowCells);
-				System.out.println("---------------------");
+			if (cell.getCellType() != CellType.BLANK) {
+				if (cs.getFillForegroundColorColor().getARGBHex().equals(redARGBHEX)) {
+					redCount++;
+				}
+				else if (cs.getFillForegroundColorColor().getARGBHex().equals(yellowARGBHEX)) {
+					yellowCount++;
+				}
+			}
+
+			if (font.getBold() && (font.getFontHeightInPoints() == 8 || font.getFontHeightInPoints() == 10)) {
+				System.out.println("К: " + redCount);
+				System.out.println("Ж: " + yellowCount);
+				System.out.println("-----------------");
 				return;
 			}
 		}
