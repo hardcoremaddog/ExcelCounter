@@ -15,8 +15,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class CellsCounter {
 
@@ -31,6 +29,7 @@ public class CellsCounter {
 	private final String TSEH_217 = "Вагоносборочный цех № 217";
 	private final String TSEH_317 = "Цех по сборке тележек и кузовов  № 317";
 	private final String TSEH_416 = "Механосборочный  цех № 416";
+	private final String TSEH_417 = "Цех изделий малых серий  № 417";
 	private final String TSEH_517 = "Цех окраски вагонов № 517";
 	private final String VVMMZ = "Производственный участок";
 	private final String UVK = "Управление внешней комплектации";
@@ -47,7 +46,7 @@ public class CellsCounter {
 		this.table = table;
 	}
 
-	public void run() {
+	public void run(int param) {
 		readMain(all);
 
 		for (Order order : orders) {
@@ -65,7 +64,22 @@ public class CellsCounter {
 		}
 
 		if (table != null) {
-			writeResultTo765Table(table);
+			if (param != 0) {
+				switch (param) {
+					case 1: {
+						writeResultTo765Table(table);
+						break;
+					}
+					case 2: {
+						writeResultTo753Table(table);
+						break;
+					}
+					case 3: {
+						writeResultToOrdersTable(table);
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -75,16 +89,26 @@ public class CellsCounter {
 			XSSFWorkbook allWorkBook = new XSSFWorkbook(allFileInputStream);
 			XSSFSheet allSheet = allWorkBook.getSheetAt(0);
 
-			for (Row row : allSheet) {
+			for (int i = 0; i < allSheet.getPhysicalNumberOfRows(); i++) {
+				Row row = allSheet.getRow(i);
 				for (Cell cell : row) {
 					if (cell.getCellType() == CellType.STRING) {
 						if (cell.getStringCellValue().startsWith("(")
+								|| cell.getStringCellValue().startsWith("При")
+								|| cell.getStringCellValue().startsWith("16-")
+								|| cell.getStringCellValue().startsWith("17-")
+								|| cell.getStringCellValue().startsWith("18-")
+								|| cell.getStringCellValue().startsWith("19-")
+								|| cell.getStringCellValue().startsWith("20-")
+								|| cell.getStringCellValue().startsWith("21-")
+								|| cell.getStringCellValue().startsWith("22-")
 								|| cell.getStringCellValue().startsWith("16_")
 								|| cell.getStringCellValue().startsWith("17_")
 								|| cell.getStringCellValue().startsWith("18_")
 								|| cell.getStringCellValue().startsWith("19_")
 								|| cell.getStringCellValue().startsWith("20_")
-								|| cell.getStringCellValue().startsWith("21_")) {
+								|| cell.getStringCellValue().startsWith("21_")
+								|| cell.getStringCellValue().startsWith("22_")) {
 							String orderNumber = cell.getStringCellValue();
 							Order order = new Order(orderNumber);
 							readColumn(cell.getColumnIndex(), allSheet, order);
@@ -208,6 +232,10 @@ public class CellsCounter {
 											row.getCell(17).setCellValue(department.getRedCellsCount());
 											break;
 										}
+										case VVMMZ: {
+											row.getCell(18).setCellValue(department.getRedCellsCount());
+											break;
+										}
 									}
 								}
 							}
@@ -228,71 +256,187 @@ public class CellsCounter {
 		}
 	}
 
-	private List<Department> getSortedDepartmentsListFor765Table(ArrayList<Department> departments) {
-		Department[] sortedDepartments = new Department[12];
+	private void writeResultTo753Table(File table) {
+		try {
+			FileInputStream tableFileInputStream = new FileInputStream(table);
+			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
+			XSSFSheet tableSheet = tableWorkbook.getSheetAt(0);
 
-		for (Department department : departments) {
-			switch (department.getName()) {
-				case UVK: {
-					sortedDepartments[0] = department;
-					break;
-				}
-				case OMO: {
-					sortedDepartments[1] = department;
-					break;
-				}
+			for (int i = 4; i < 50; i++) {
+				Row row = tableSheet.getRow(i);
+				Cell orderCell = row.getCell(1);
 
-				case OMZK: {
-					sortedDepartments[2] = department;
-					break;
-				}
-
-				case TSEH_5: {
-					sortedDepartments[3] = department;
-					break;
-				}
-
-				case TSEH_10: {
-					sortedDepartments[4] = department;
-					break;
-				}
-
-				case TSEH_51: {
-					sortedDepartments[5] = department;
-					break;
-				}
-
-				case TSEH_121: {
-					sortedDepartments[6] = department;
-					break;
-				}
-
-				case TSEH_217: {
-					sortedDepartments[7] = department;
-					break;
-				}
-
-				case TSEH_317: {
-					sortedDepartments[8] = department;
-					break;
-				}
-
-				case TSEH_416: {
-					sortedDepartments[9] = department;
-					break;
-				}
-
-				case TSEH_517: {
-					sortedDepartments[10] = department;
-					break;
-				}
-
-				case VVMMZ: {
-					sortedDepartments[11] = department;
-					break;
+				for (Order order : orders) {
+					switch (orderCell.getCellType()) {
+						case STRING: {
+							if (orderCell.getStringCellValue().contains(order.getName())) {
+								for (Department department : order.getDepartments()) {
+									switch (department.getName()) {
+										case UVK: {
+											row.getCell(2).setCellValue(department.getYellowCellsCount());
+											row.getCell(6).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case OMO: {
+											row.getCell(3).setCellValue(department.getYellowCellsCount());
+											row.getCell(7).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case OMZK: {
+											row.getCell(4).setCellValue(department.getYellowCellsCount());
+											row.getCell(8).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_5: {
+											row.getCell(10).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_10: {
+											row.getCell(11).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_51: {
+											row.getCell(12).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_121: {
+											row.getCell(13).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_217: {
+											row.getCell(14).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_317: {
+											row.getCell(15).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_416: {
+											row.getCell(16).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_417: {
+											row.getCell(17).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_517: {
+											row.getCell(18).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case VVMMZ: {
+											row.getCell(19).setCellValue(department.getRedCellsCount());
+											break;
+										}
+									}
+								}
+							}
+							break;
+						}
+					}
 				}
 			}
+
+			FileOutputStream tableFileOutputStream = new FileOutputStream(table);
+			tableWorkbook.write(tableFileOutputStream);
+
+			tableWorkbook.close();
+			tableFileInputStream.close();
+			tableFileOutputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return Arrays.asList(sortedDepartments);
+	}
+
+	private void writeResultToOrdersTable(File table) {
+		try {
+			FileInputStream tableFileInputStream = new FileInputStream(table);
+			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
+			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
+
+			for (int i = 3; i < 100; i++) {
+				Row row = tableSheet.getRow(i);
+				Cell orderCell = row.getCell(2);
+
+				for (Order order : orders) {
+					switch (orderCell.getCellType()) {
+						case STRING: {
+							if (orderCell.getStringCellValue().contains(order.getName())) {
+								for (Department department : order.getDepartments()) {
+									switch (department.getName()) {
+										case UVK: {
+											row.getCell(6).setCellValue(department.getYellowCellsCount());
+											row.getCell(3).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case OMO: {
+											row.getCell(7).setCellValue(department.getYellowCellsCount());
+											row.getCell(4).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case OMZK: {
+											row.getCell(8).setCellValue(department.getYellowCellsCount());
+											row.getCell(5).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_5: {
+											row.getCell(27).setCellValue(department.getYellowCellsCount());
+											row.getCell(19).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_10: {
+											row.getCell(28).setCellValue(department.getYellowCellsCount());
+											row.getCell(20).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_51: {
+											row.getCell(29).setCellValue(department.getYellowCellsCount());
+											row.getCell(21).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_121: {
+											row.getCell(30).setCellValue(department.getYellowCellsCount());
+											row.getCell(22).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_217: {
+											row.getCell(31).setCellValue(department.getYellowCellsCount());
+											row.getCell(23).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_317: {
+											row.getCell(32).setCellValue(department.getYellowCellsCount());
+											row.getCell(24).setCellValue(department.getRedCellsCount());
+											break;
+										}
+										case TSEH_416: {
+											row.getCell(33).setCellValue(department.getYellowCellsCount());
+											row.getCell(25).setCellValue(department.getRedCellsCount());
+											break;
+										}
+
+										case TSEH_517: {
+											row.getCell(34).setCellValue(department.getYellowCellsCount());
+											row.getCell(26).setCellValue(department.getRedCellsCount());
+											break;
+										}
+									}
+								}
+							}
+							break;
+						}
+					}
+				}
+			}
+
+			FileOutputStream tableFileOutputStream = new FileOutputStream(table);
+			tableWorkbook.write(tableFileOutputStream);
+
+			tableWorkbook.close();
+			tableFileInputStream.close();
+			tableFileOutputStream.close();
+		} catch (
+				IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
