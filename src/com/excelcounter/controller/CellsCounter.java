@@ -44,21 +44,24 @@ public class CellsCounter {
 		this.table = table;
 	}
 
-	public void run(int param) {
+	public void run(int param, boolean showResult) {
 		readMain(all);
 
-		for (Order order : orders) {
-			System.out.println("=====================");
-			System.out.println(order.getName());
-			System.out.println("=====================");
-			for (Department department : order.getDepartments()) {
+		if (showResult) {
+			for (Order order : orders) {
+				System.out.println("=====================");
+				System.out.println(order.getName());
+				System.out.println("=====================");
+				for (Department department : order.getDepartments()) {
+					System.out.println("--------------------------------");
+					System.out.println(department.getName());
+					System.out.println("Красных позиций: " + department.getRedCellsCount());
+					System.out.println("Желтых позиций: " + department.getYellowCellsCount());
+				}
 				System.out.println("--------------------------------");
-				System.out.println(department.getName());
-				System.out.println("Красных позиций: " + department.getRedCellsCount());
-				System.out.println("Желтых позиций: " + department.getYellowCellsCount());
+				System.out.println("\n \n \n");
 			}
-			System.out.println("--------------------------------");
-			System.out.println("\n \n \n");
+
 		}
 
 		if (table != null) {
@@ -109,7 +112,6 @@ public class CellsCounter {
 						Order order = new Order(orderNumber);
 						readColumn(cell.getColumnIndex(), allSheet, order);
 						orders.add(order);
-						System.out.println(order.getName());
 					}
 				}
 			}

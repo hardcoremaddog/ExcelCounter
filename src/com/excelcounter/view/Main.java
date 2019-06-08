@@ -1,4 +1,4 @@
-package com.excelcounter;
+package com.excelcounter.view;
 
 import com.excelcounter.controller.CellsCounter;
 
@@ -10,7 +10,22 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		while (true) {
+			GUI app = new GUI();
+			app.setVisible(true);
+
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+			System.out.println("ExcelCounter v0.4" +
+					"\nby Alexey Zheludov" +
+					"\nCopyright © 2019 MDDG Software, All rights reserved.\n" +
+
+					" \nПриложение разработано исключительно для нужд МВМ ПДУ." +
+					" \nИспользование приложения в других целях не гарантирует его корректную работу," +
+					" \nа автор не несет ответственности за испорченные, в ходе работы приложения, файлы!" +
+
+
+
+					"\nРаботать в приложении можно как с помощью консоли, так и в пользовательском интерфейсе. \n\n");
 
 			System.out.println("Введите полный путь к книге с данными: ");
 			String allPath = br.readLine();
@@ -58,7 +73,7 @@ public class Main {
 			}
 
 			System.out.println("ОК. Файлы прошли проверку. Начинаю работу...");
-			cellsCounter.run(param);
+			cellsCounter.run(param, true);
 
 			while (true) {
 				System.out.println("Введите \"ДА\" и нажмите Enter, если хотите продолжить, или просто нажмите Enter, если хотите завешить работу программы");
