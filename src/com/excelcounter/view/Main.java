@@ -2,6 +2,7 @@ package com.excelcounter.view;
 
 import com.excelcounter.controller.CellsCounter;
 
+import javax.swing.*;
 import java.io.*;
 
 public class Main {
@@ -9,10 +10,16 @@ public class Main {
 	private static File table;
 
 	public static void main(String[] args) throws IOException {
-		while (true) {
-			GUI app = new GUI();
-			app.setVisible(true);
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
+			e.printStackTrace();
+		}
 
+		GUI app = new GUI();
+		app.setVisible(true);
+
+		while (true) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 			System.out.println("ExcelCounter v0.4" +
@@ -64,10 +71,12 @@ public class Main {
 			}
 
 			CellsCounter cellsCounter;
-			if (table == null) {
+			if (all != null && table != null) {
+				cellsCounter = new CellsCounter(all, table);
+			} else if (all != null) {
 				cellsCounter = new CellsCounter(all);
 			} else {
-				cellsCounter = new CellsCounter(all, table);
+				continue;
 			}
 
 			System.out.println("ОК. Файлы прошли проверку. Начинаю работу...");

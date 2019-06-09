@@ -7,17 +7,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GUI extends JFrame {
+
+	private File all;
+	private File table;
+
 	private JButton startWork = new JButton("Посчитать и записать");
 
-	private JTextField allPathField = new JTextField("", 5);
-	private JTextField tablePathField = new JTextField("", 5);
+	private JButton allFileChooserButton = new JButton("Выбрать книгу .xlsx с данными");
+	private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx с таблицей");
+	private JLabel allFilePathLabel = new JLabel();
+	private JLabel tableFilePathLabel = new JLabel();
 
-	private JLabel allPathFieldLabel = new JLabel("Полный путь до книги с данными");
-	private JLabel tablePathFieldLabel = new JLabel("Полный путь до книги с таблицей (опционально)");
 	private JLabel tableTypeLabel = new JLabel("Тип таблицы для записи данных");
-
 	private JRadioButton table765Radio = new JRadioButton("765");
 	private JRadioButton table753Radio = new JRadioButton("753");
 	private JRadioButton tableOrdersRadio = new JRadioButton("Заказы");
@@ -30,12 +34,12 @@ public class GUI extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		Container container = this.getContentPane();
-		container.setLayout(new GridLayout(5, 2, 2, 2));
-		container.add(allPathFieldLabel);
-		container.add(tablePathFieldLabel);
+		container.setLayout(new GridLayout(5, 4, 4, 2));
 
-		container.add(allPathField);
-		container.add(tablePathField);
+		container.add(allFileChooserButton);
+		container.add(tableFileChooseButton);
+		container.add(allFilePathLabel);
+		container.add(tableFilePathLabel);
 
 		ButtonGroup group = new ButtonGroup();
 		group.add(table765Radio);
@@ -50,9 +54,44 @@ public class GUI extends JFrame {
 
 		container.add(check);
 
+		allFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
+		tableFileChooseButton.addActionListener(new TableFileChooseButtonActionListener());
 		startWork.addActionListener(new CountButtonEventListener(this));
 		container.add(startWork);
 	}
+
+	private void setXLSXFilter(JFileChooser fileChooser) {
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("XLSX files", "xlsx");
+		fileChooser.setFileFilter(filter);
+	}
+
+	class allFileChooseButtonActionListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser allFileChooser = new JFileChooser();
+			setXLSXFilter(allFileChooser);
+			int ret = allFileChooser.showDialog(null, "Выбрать файл книги с данными");
+			if (ret == JFileChooser.APPROVE_OPTION) {
+				all = allFileChooser.getSelectedFile();
+				allFilePathLabel.setText(all.getAbsolutePath());
+			}
+		}
+	}
+
+	class TableFileChooseButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser tableFileChooser = new JFileChooser();
+			setXLSXFilter(tableFileChooser);
+			int ret = tableFileChooser.showDialog(null, "Выбрать файл книги с таблицей");
+			if (ret == JFileChooser.APPROVE_OPTION) {
+				table = tableFileChooser.getSelectedFile();
+				tableFilePathLabel.setText(table.getAbsolutePath());
+			}
+		}
+	}
+
 
 	class CountButtonEventListener implements ActionListener {
 
@@ -65,28 +104,28 @@ public class GUI extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			if (gui.allPathField.getText().isEmpty()) {
-				System.out.println("Необходимо указать путь до книги с данными!");
-			} else {
-				CellsCounter cellsCounter;
-				if (!gui.tablePathField.getText().isEmpty()) {
-					cellsCounter = new CellsCounter(new File(gui.allPathField.getText()), new File(gui.tablePathField.getText()));
-				} else {
-					cellsCounter = new CellsCounter(new File(gui.allPathField.getText()));
-				}
-
-				int param;
-				if (table753Radio.isSelected()) {
-					param = 2;
-				}
-				else if (tableOrdersRadio.isSelected()) {
-					param = 3;
-				} else {
-					param = 1;
-				}
-
-				cellsCounter.run(param, gui.check.isSelected());
+			CellsCounter cellsCounter;
+			if (all == null) {
+				System.out.println("Необходимо выбрать файл книги с данными!");
+				return;
 			}
+
+			if (table != null) {
+				cellsCounter = new CellsCounter(all, table);
+			} else {
+				cellsCounter = new CellsCounter(all);
+			}
+
+			int param;
+			if (table753Radio.isSelected()) {
+				param = 2;
+			} else if (tableOrdersRadio.isSelected()) {
+				param = 3;
+			} else {
+				param = 1;
+			}
+
+			cellsCounter.run(param, gui.check.isSelected());
 		}
 	}
 }
