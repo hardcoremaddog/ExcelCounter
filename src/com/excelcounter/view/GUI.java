@@ -2,19 +2,17 @@ package com.excelcounter.view;
 
 import com.excelcounter.controller.CellsCounter;
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.IOException;
 
 public class GUI extends JFrame {
-
 	private File all;
 	private File table;
-
-	private JButton startWork = new JButton("Посчитать и записать");
 
 	private JButton allFileChooserButton = new JButton("Выбрать книгу .xlsx с данными");
 	private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx с таблицей");
@@ -28,7 +26,9 @@ public class GUI extends JFrame {
 
 	private JCheckBox check = new JCheckBox("Вывести результат подсчета в консоль", true);
 
-	public GUI() {
+	private JButton startWork = new JButton("Посчитать и записать");
+
+	GUI() {
 		super("ExcelCounter v0.4 [Парсер .xlsx таблиц из \"светофора\"]");
 		this.setBounds(100, 100, 700, 350);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -65,14 +65,22 @@ public class GUI extends JFrame {
 		fileChooser.setFileFilter(filter);
 	}
 
-	class allFileChooseButtonActionListener implements ActionListener {
+	private void checkFile(JFileChooser fileChooser) {
+		try {
+			Main.checkFile(fileChooser.getSelectedFile());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
 
+	class allFileChooseButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser allFileChooser = new JFileChooser();
 			setXLSXFilter(allFileChooser);
 			int ret = allFileChooser.showDialog(null, "Выбрать файл книги с данными");
 			if (ret == JFileChooser.APPROVE_OPTION) {
+				checkFile(allFileChooser);
 				all = allFileChooser.getSelectedFile();
 				allFilePathLabel.setText(all.getAbsolutePath());
 			}
@@ -86,24 +94,21 @@ public class GUI extends JFrame {
 			setXLSXFilter(tableFileChooser);
 			int ret = tableFileChooser.showDialog(null, "Выбрать файл книги с таблицей");
 			if (ret == JFileChooser.APPROVE_OPTION) {
+				checkFile(tableFileChooser);
 				table = tableFileChooser.getSelectedFile();
 				tableFilePathLabel.setText(table.getAbsolutePath());
 			}
 		}
 	}
 
-
 	class CountButtonEventListener implements ActionListener {
-
 		private GUI gui;
-
 		private CountButtonEventListener(GUI gui) {
 			this.gui = gui;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
 			CellsCounter cellsCounter;
 			if (all == null) {
 				System.out.println("Необходимо выбрать файл книги с данными!");
@@ -124,7 +129,6 @@ public class GUI extends JFrame {
 			} else {
 				param = 1;
 			}
-
 			cellsCounter.run(param, gui.check.isSelected());
 		}
 	}

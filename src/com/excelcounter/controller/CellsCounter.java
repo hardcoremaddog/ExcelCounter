@@ -61,7 +61,6 @@ public class CellsCounter {
 				System.out.println("--------------------------------");
 				System.out.println("\n \n \n");
 			}
-
 		}
 
 		if (table != null) {

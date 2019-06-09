@@ -17,7 +17,10 @@ public class Main {
 		}
 
 		GUI app = new GUI();
+
 		app.setVisible(true);
+
+
 
 		while (true) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -106,7 +109,7 @@ public class Main {
 		}
 	}
 
-	private static void checkFile(File file) throws IOException {
+	protected static void checkFile(File file) throws IOException {
 		if (!file.exists() && !file.isFile()) {
 			throw new FileNotFoundException("Неверно указан путь до книги excel с данными. Книги по этому пути не существует!");
 		}
