@@ -27,7 +27,7 @@ public class Main {
 
 			System.out.println("ExcelCounter v0.4" +
 					"\nby Alexey Zheludov" +
-					"\nCopyright © 2019 MDDG Software, All rights reserved.\n" +
+					"\nCopyright (c) 2019 MDDG Software, All rights reserved.\n" +
 
 					" \nПриложение разработано исключительно для нужд МВМ ПДУ." +
 					" \nИспользование приложения в других целях не гарантирует его корректную работу," +
