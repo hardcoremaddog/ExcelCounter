@@ -133,9 +133,7 @@ public class GUI extends JFrame {
 			if (all == null && sbyt == null) {
 				System.out.println("Необходимо выбрать по крайней мере один файл книги с данными!");
 				return;
-			}
-
-			else if (table != null) {
+			} else if (table != null) {
 				cellsCounter = new CellsCounter(all, table, sbyt);
 			} else {
 				cellsCounter = new CellsCounter(all, sbyt);
