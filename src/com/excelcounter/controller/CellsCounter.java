@@ -3,6 +3,7 @@ package com.excelcounter.controller;
 import com.excelcounter.model.Department;
 import com.excelcounter.model.Order;
 import com.excelcounter.model.OrderSbyt;
+import com.excelcounter.view.GUI;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class CellsCounter {
+	GUI gui;
 
 	private File all;
 	private File table;
@@ -38,24 +40,28 @@ public class CellsCounter {
 	private final String OMO = "Отдел материального обеспечения";
 	private final String MMZ02 = "02ММЗ ММЗ Цех 02";
 
-	public CellsCounter(File all) {
+	public CellsCounter(File all, GUI gui) {
 		this.all = all;
+		this.gui = gui;
 	}
 
-	public CellsCounter(File all, File sbyt) {
+	public CellsCounter(File all, File sbyt, GUI gui) {
 		this.all = all;
 		this.sbyt = sbyt;
+		this.gui = gui;
 	}
 
-	public CellsCounter(File all, File table, File sbyt) {
+	public CellsCounter(File all, File table, File sbyt, GUI gui) {
 		this.all = all;
 		this.table = table;
 		this.sbyt = sbyt;
+		this.gui = gui;
 	}
 
 	public void run(int param, boolean showResult) {
 		if (all != null) {
 			readMain(all);
+
 		}
 
 		if (sbyt != null) {
@@ -108,6 +114,7 @@ public class CellsCounter {
 				}
 			}
 		}
+		gui.progressBar.setValue(100);
 	}
 
 	private void recalculateFormulas(XSSFWorkbook workbook) {
