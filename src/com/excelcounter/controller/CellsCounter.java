@@ -2,6 +2,7 @@ package com.excelcounter.controller;
 
 import com.excelcounter.model.Department;
 import com.excelcounter.model.Order;
+import com.excelcounter.model.OrderSbyt;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -18,7 +19,9 @@ public class CellsCounter {
 
 	private File all;
 	private File table;
+	private File sbyt = null;
 	private ArrayList<Order> orders = new ArrayList<>();
+	private ArrayList<OrderSbyt> ordersSbyt = new ArrayList<>();
 
 	private final String TSEH_5 = "Сварочно - сборочный цех № 5";
 	private final String TSEH_10 = "Электромонтажный цех № 10";
@@ -39,27 +42,53 @@ public class CellsCounter {
 		this.all = all;
 	}
 
-	public CellsCounter(File all, File table) {
+	public CellsCounter(File all, File sbyt) {
+		this.all = all;
+		this.sbyt = sbyt;
+	}
+
+	public CellsCounter(File all, File table, File sbyt) {
 		this.all = all;
 		this.table = table;
+		this.sbyt = sbyt;
 	}
 
 	public void run(int param, boolean showResult) {
-		readMain(all);
+		if (all != null) {
+			readMain(all);
+		}
+
+		if (sbyt != null) {
+			readSbyt(sbyt);
+		}
 
 		if (showResult) {
-			for (Order order : orders) {
-				System.out.println("=====================");
-				System.out.println(order.getName());
-				System.out.println("=====================");
-				for (Department department : order.getDepartments()) {
+			if (all != null) {
+				for (Order order : orders) {
+					System.out.println("=====================");
+					System.out.println(order.getName());
+					System.out.println("=====================");
+					for (Department department : order.getDepartments()) {
+						System.out.println("--------------------------------");
+						System.out.println(department.getName());
+						System.out.println("Красных позиций: " + department.getRedCellsCount());
+						System.out.println("Желтых позиций: " + department.getYellowCellsCount());
+					}
 					System.out.println("--------------------------------");
-					System.out.println(department.getName());
-					System.out.println("Красных позиций: " + department.getRedCellsCount());
-					System.out.println("Желтых позиций: " + department.getYellowCellsCount());
+					System.out.println("\n \n \n");
 				}
-				System.out.println("--------------------------------");
-				System.out.println("\n \n \n");
+			}
+
+			if (sbyt != null) {
+				for (OrderSbyt orderSbyt : ordersSbyt) {
+					System.out.println("=====================");
+					System.out.println(orderSbyt.getName());
+					System.out.println("=====================");
+					System.out.println("--------------------------------");
+					System.out.println("Непереданных поцизий: " + orderSbyt.getRedCells());
+					System.out.println("--------------------------------");
+					System.out.println("\n");
+				}
 			}
 		}
 
@@ -96,6 +125,71 @@ public class CellsCounter {
 		}
 	}
 
+	private void readSbyt(File sbyt) {
+		try {
+			FileInputStream sbytFileInputStream = new FileInputStream(sbyt);
+			XSSFWorkbook sbytWorkBook = new XSSFWorkbook(sbytFileInputStream);
+			XSSFSheet sbytSheet = sbytWorkBook.getSheetAt(0);
+
+			for (int i = 3; i < sbytSheet.getPhysicalNumberOfRows(); i++) {
+				Row row = sbytSheet.getRow(i);
+				Cell cell = row.getCell(0);
+
+				if (cell.getCellType() == CellType.STRING) {
+					XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
+
+					if (cs.getFillForegroundColorColor() == null) {
+						continue;
+					}
+
+					String blueARGBHex = "FFC6E2FF";
+
+					if (cs.getFillForegroundColorColor().getARGBHex().equals(blueARGBHex)) {
+						String orderNumber = cell.getStringCellValue().substring(0, cell.getStringCellValue().lastIndexOf(',')).trim();
+						OrderSbyt orderSbyt = new OrderSbyt(orderNumber);
+						countSbyt(i + 1, sbytSheet, orderSbyt);
+						ordersSbyt.add(orderSbyt);
+					}
+				}
+			}
+
+			sbytFileInputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void countSbyt(int rowNum, XSSFSheet sheet, OrderSbyt orderSbyt) {
+		int cellsCount = 0;
+
+		for (int i = rowNum; i < sheet.getPhysicalNumberOfRows(); i++) {
+			Row row = sheet.getRow(i);
+			Cell cell = row.getCell(0);
+
+			XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
+
+			String blueARGBHEX = "FFC6E2FF";
+			String lightBlueARGBHEX = "FFDCF1FF";
+			String darkBlueARGBHEX = "FF4A62B9";
+
+			if (cell.getCellType() != CellType.BLANK) {
+				if (cs.getFillForegroundColorColor() == null) {
+					continue;
+				}
+
+				if (cs.getFillForegroundColorColor().getARGBHex().equals(lightBlueARGBHEX)) {
+					cellsCount++;
+				}
+
+				if (cs.getFillForegroundColorColor().getARGBHex().equals(blueARGBHEX)
+						|| cs.getFillForegroundColorColor().getARGBHex().equals(darkBlueARGBHEX)) {
+					orderSbyt.setRedCells(cellsCount);
+					return;
+				}
+			}
+		}
+	}
+
 	private void readMain(File all) {
 		try {
 			FileInputStream allFileInputStream = new FileInputStream(all);
@@ -120,6 +214,7 @@ public class CellsCounter {
 			e.printStackTrace();
 		}
 	}
+
 
 	private void readColumn(int columnNum, XSSFSheet sheet, Order order) {
 		for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
@@ -397,6 +492,13 @@ public class CellsCounter {
 								}
 							}
 						}
+					}
+				}
+
+				for (OrderSbyt orderSbyt : ordersSbyt) {
+					if (orderCell.getCellType() == CellType.STRING
+							&& orderCell.getStringCellValue().contains(orderSbyt.getName())) {
+						row.getCell(35).setCellValue(orderSbyt.getRedCells());
 					}
 				}
 			}

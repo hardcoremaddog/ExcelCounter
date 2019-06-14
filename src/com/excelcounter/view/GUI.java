@@ -13,10 +13,14 @@ import java.io.IOException;
 public class GUI extends JFrame {
 	private File all;
 	private File table;
+	private File sbyt;
 
 	private JButton allFileChooserButton = new JButton("Выбрать книгу .xlsx с данными");
+	private JButton sbytFileChooseButton = new JButton("Выбрать книгу .xlsx КПНС");
 	private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx с таблицей");
+
 	private JLabel allFilePathLabel = new JLabel();
+	private JLabel sbytFilePathLaber = new JLabel();
 	private JLabel tableFilePathLabel = new JLabel();
 
 	private JLabel tableTypeLabel = new JLabel("Тип таблицы для записи данных");
@@ -29,16 +33,18 @@ public class GUI extends JFrame {
 	private JButton startWork = new JButton("Посчитать и записать");
 
 	GUI() {
-		super("ExcelCounter v0.4 [Парсер .xlsx таблиц из \"светофора\"]");
-		this.setBounds(100, 100, 700, 350);
+		super("ExcelCounter v0.6a");
+		this.setBounds(100, 100, 900, 350);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		Container container = this.getContentPane();
-		container.setLayout(new GridLayout(5, 4, 4, 2));
+		container.setLayout(new GridLayout(4, 1, 1, 1));
 
 		container.add(allFileChooserButton);
+		container.add(sbytFileChooseButton);
 		container.add(tableFileChooseButton);
 		container.add(allFilePathLabel);
+		container.add(sbytFilePathLaber);
 		container.add(tableFilePathLabel);
 
 		ButtonGroup group = new ButtonGroup();
@@ -52,11 +58,11 @@ public class GUI extends JFrame {
 		container.add(table753Radio);
 		container.add(tableOrdersRadio);
 
-		container.add(check);
-
 		allFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
+		sbytFileChooseButton.addActionListener(new sbytFileChooseButtonActionListener());
 		tableFileChooseButton.addActionListener(new TableFileChooseButtonActionListener());
 		startWork.addActionListener(new CountButtonEventListener(this));
+		container.add(check);
 		container.add(startWork);
 	}
 
@@ -87,6 +93,20 @@ public class GUI extends JFrame {
 		}
 	}
 
+	class sbytFileChooseButtonActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser sbytFileChooser = new JFileChooser();
+			setXLSXFilter(sbytFileChooser);
+			int ret = sbytFileChooser.showDialog(null, "Выбрать файл книги контроля передачи на сбыт");
+			if (ret == JFileChooser.APPROVE_OPTION) {
+				checkFile(sbytFileChooser);
+				sbyt = sbytFileChooser.getSelectedFile();
+				sbytFilePathLaber.setText(sbyt.getAbsolutePath());
+			}
+		}
+	}
+
 	class TableFileChooseButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -110,15 +130,15 @@ public class GUI extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			CellsCounter cellsCounter;
-			if (all == null) {
-				System.out.println("Необходимо выбрать файл книги с данными!");
+			if (all == null && sbyt == null) {
+				System.out.println("Необходимо выбрать по крайней мере один файл книги с данными!");
 				return;
 			}
 
-			if (table != null) {
-				cellsCounter = new CellsCounter(all, table);
+			else if (table != null) {
+				cellsCounter = new CellsCounter(all, table, sbyt);
 			} else {
-				cellsCounter = new CellsCounter(all);
+				cellsCounter = new CellsCounter(all, sbyt);
 			}
 
 			int param;
@@ -133,6 +153,3 @@ public class GUI extends JFrame {
 		}
 	}
 }
-
-
-

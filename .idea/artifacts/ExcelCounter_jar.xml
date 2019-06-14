@@ -3,12 +3,13 @@
     <output-path>$PROJECT_DIR$/out/artifacts/ExcelCounter_jar</output-path>
     <root id="archive" name="ExcelCounter.jar">
       <element id="module-output" name="ExcelCounter" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/commons-math3-3.6.1.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/commons-compress-1.18.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/poi-4.1.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/poi-ooxml-4.1.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/libs/commons-collections4-4.3.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/xmlbeans-3.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/commons-compress-1.18.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/poi-ooxml-4.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/commons-math3-3.6.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/ooxml-schemas-1.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/commons-collections4-4.3.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
