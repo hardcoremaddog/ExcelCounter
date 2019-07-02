@@ -37,6 +37,7 @@ public class CellsCounter {
 	private final String VVMMZ = "Производственный участок";
 	private final String UVK = "Управление внешней комплектации";
 	private final String OMZK = "Отдел межзаводской кооперации";
+	private final String OMZK_new = "Отдел материального обеспечения и сервисных закупок";
 	private final String OMO = "Отдел материального обеспечения";
 	private final String MMZ02 = "02ММЗ ММЗ Цех 02";
 
@@ -297,6 +298,11 @@ public class CellsCounter {
 									row.getCell(8).setCellValue(department.getRedCellsCount());
 									break;
 								}
+								case OMZK_new: {
+									row.getCell(4).setCellValue(department.getYellowCellsCount());
+									row.getCell(8).setCellValue(department.getRedCellsCount());
+									break;
+								}
 								case TSEH_5: {
 									row.getCell(10).setCellValue(department.getRedCellsCount());
 									break;
@@ -370,6 +376,11 @@ public class CellsCounter {
 									break;
 								}
 								case OMZK: {
+									row.getCell(4).setCellValue(department.getYellowCellsCount());
+									row.getCell(8).setCellValue(department.getRedCellsCount());
+									break;
+								}
+								case OMZK_new: {
 									row.getCell(4).setCellValue(department.getYellowCellsCount());
 									row.getCell(8).setCellValue(department.getRedCellsCount());
 									break;
@@ -452,6 +463,11 @@ public class CellsCounter {
 									break;
 								}
 								case OMZK: {
+									row.getCell(8).setCellValue(department.getYellowCellsCount());
+									row.getCell(5).setCellValue(department.getRedCellsCount());
+									break;
+								}
+								case OMZK_new: {
 									row.getCell(8).setCellValue(department.getYellowCellsCount());
 									row.getCell(5).setCellValue(department.getRedCellsCount());
 									break;
