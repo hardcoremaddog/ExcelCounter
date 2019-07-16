@@ -219,6 +219,7 @@ public class CellsCounter {
 				} else if (cell.getCellType() == CellType.NUMERIC
 						&& (cell.getNumericCellValue() == 765
 						|| cell.getNumericCellValue() == 7654
+						|| cell.getNumericCellValue() == 7655
 						|| cell.getNumericCellValue() == 75300
 						|| cell.getNumericCellValue() == 75310
 						|| cell.getNumericCellValue() == 75311)) {
