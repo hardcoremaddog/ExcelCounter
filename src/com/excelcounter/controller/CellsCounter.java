@@ -206,7 +206,17 @@ public class CellsCounter {
 
 			Row row = allSheet.getRow(0);
 			for (Cell cell : row) {
-				if (cell.getCellType() == CellType.NUMERIC
+				//если это обычный номер заказа
+				if (cell.getCellType() == CellType.STRING) {
+					XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
+					if (cs.getAlignment() == HorizontalAlignment.CENTER) {
+						String orderNumber = cell.getStringCellValue();
+						Order order = new Order(orderNumber);
+						readColumn(cell.getColumnIndex(), allSheet, order);
+						orders.add(order);
+					}
+					//если это ебучий ЗИП
+				} else if (cell.getCellType() == CellType.NUMERIC
 						&& (cell.getNumericCellValue() == 765
 						|| cell.getNumericCellValue() == 7654
 						|| cell.getNumericCellValue() == 75300
@@ -214,12 +224,19 @@ public class CellsCounter {
 						|| cell.getNumericCellValue() == 75311)) {
 					XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
 					if (cs.getAlignment() == HorizontalAlignment.CENTER) {
-						String orderNumber = String.valueOf(cell.getNumericCellValue());
-						Order order = new Order(orderNumber);
-						readColumn(cell.getColumnIndex(), allSheet, order);
-						orders.add(order);
-					} else if (cell.getCellType() == CellType.STRING) {
-						String orderNumber = cell.getStringCellValue();
+						DataFormatter formatter = new DataFormatter();
+						String orderNumber = formatter.formatCellValue(cell);
+
+						//костыль
+						//todo ебучий ноль вываливается, ебучая запятая добавляется
+						StringBuilder sb = new StringBuilder(orderNumber);
+						if (orderNumber.contains("765")) {
+							sb.insert(orderNumber.indexOf('-') + 1,"0");
+						} else if (orderNumber.contains("753")) {
+							sb.insert(orderNumber.indexOf('П') + 1,"0");
+						}
+						orderNumber = sb.toString().replaceAll(",", "");
+
 						Order order = new Order(orderNumber);
 						readColumn(cell.getColumnIndex(), allSheet, order);
 						orders.add(order);
