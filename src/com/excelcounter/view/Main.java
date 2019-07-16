@@ -1,8 +1,9 @@
 package com.excelcounter.view;
-import com.excelcounter.controller.CellsCounter;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Main {
 //	private static File all;
@@ -28,7 +29,7 @@ public class Main {
 				"\nподсчета количества непереданных позиций на сбыт" +
 				"\nв формах отчета \"Контроль передачи на сбыт\"" +
 				"\nа также записи результата в книги Excel." +
-				"\nПриложение работает ТОЛЬКО с книгами формата .xlsx." +
+				"\nПриложение работает ТОЛЬКО с книгами формата .xlsx и .xlsm." +
 				"\nИспользование приложения в других целях не гарантирует" +
 				"\nего корректную работу, а автор не несет ответственности" +
 				"\nза испорченные, в ходе работы приложения, файлы!" +
@@ -121,8 +122,8 @@ public class Main {
 		if (!file.exists() && !file.isFile()) {
 			throw new FileNotFoundException("Неверно указан путь до книги excel с данными. Книги по этому пути не существует!");
 		}
-		if (!file.getName().endsWith(".xlsx")) {
-			throw new UnsupportedOperationException("Файл не является книгой excel формата .xlsx");
+		if (!file.getName().endsWith(".xlsx") && !file.getName().endsWith(".xlsm")) {
+			throw new UnsupportedOperationException("Файл не является книгой excel формата .xlsx или .xlsm");
 		}
 	}
 }

@@ -30,7 +30,7 @@ public class AdvancedGUI extends JFrame {
 	}
 
 	private void setXLSXFilter(JFileChooser fileChooser) {
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("XLSX files", "xlsx");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("XLSX/XLSM files", "xlsx", "xlsm");
 		fileChooser.setFileFilter(filter);
 
 	}

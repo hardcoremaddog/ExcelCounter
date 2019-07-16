@@ -206,13 +206,13 @@ public class CellsCounter {
 
 			Row row = allSheet.getRow(0);
 			for (Cell cell : row) {
-				if (cell.getCellType() == CellType.STRING) {
-					XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
-					if (cs.getAlignment() == HorizontalAlignment.CENTER) {
-						String orderNumber = cell.getStringCellValue();
-						Order order = new Order(orderNumber);
-						readColumn(cell.getColumnIndex(), allSheet, order);
-						orders.add(order);
+					if (cell.getCellType() != CellType.NUMERIC && cell.getStringCellValue().contains("7654")) {
+						XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
+						if (cs.getAlignment() == HorizontalAlignment.CENTER) {
+							String orderNumber = cell.getStringCellValue();
+							Order order = new Order(orderNumber);
+							readColumn(cell.getColumnIndex(), allSheet, order);
+							orders.add(order);
 					}
 				}
 			}
@@ -222,7 +222,6 @@ public class CellsCounter {
 			e.printStackTrace();
 		}
 	}
-
 
 	private void readColumn(int columnNum, XSSFSheet sheet, Order order) {
 		for (int rowNum = 0; rowNum < sheet.getPhysicalNumberOfRows(); rowNum++) {
@@ -443,7 +442,7 @@ public class CellsCounter {
 			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
 			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
 
-			for (int i = 3; i < 100; i++) {
+			for (int i = 3; i < 200; i++) {
 				Row row = tableSheet.getRow(i);
 				Cell orderCell = row.getCell(2);
 

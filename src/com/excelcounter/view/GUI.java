@@ -19,7 +19,7 @@ public class GUI extends JFrame {
 
 	private JButton allFileChooserButton = new JButton("Выбрать книгу .xlsx с данными");
 	private JButton sbytFileChooseButton = new JButton("Выбрать книгу .xlsx КПНС");
-	private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx с таблицей");
+	private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx/.xlsm с таблицей");
 
 	private JButton advancedGUIShowButton = new JButton("Перейти на дополнительный интерфейс");
 
@@ -84,7 +84,7 @@ public class GUI extends JFrame {
 	}
 
 	private void setXLSXFilter(JFileChooser fileChooser) {
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("XLSX files", "xlsx");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("XLSX/XLSM files", "xlsx", "xlsm");
 		fileChooser.setFileFilter(filter);
 	}
 
