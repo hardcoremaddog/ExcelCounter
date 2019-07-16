@@ -206,13 +206,23 @@ public class CellsCounter {
 
 			Row row = allSheet.getRow(0);
 			for (Cell cell : row) {
-					if (cell.getCellType() != CellType.NUMERIC && cell.getStringCellValue().contains("7654")) {
-						XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
-						if (cs.getAlignment() == HorizontalAlignment.CENTER) {
-							String orderNumber = cell.getStringCellValue();
-							Order order = new Order(orderNumber);
-							readColumn(cell.getColumnIndex(), allSheet, order);
-							orders.add(order);
+				if (cell.getCellType() == CellType.NUMERIC
+						&& (cell.getNumericCellValue() == 765
+						|| cell.getNumericCellValue() == 7654
+						|| cell.getNumericCellValue() == 75300
+						|| cell.getNumericCellValue() == 75310
+						|| cell.getNumericCellValue() == 75311)) {
+					XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
+					if (cs.getAlignment() == HorizontalAlignment.CENTER) {
+						String orderNumber = String.valueOf(cell.getNumericCellValue());
+						Order order = new Order(orderNumber);
+						readColumn(cell.getColumnIndex(), allSheet, order);
+						orders.add(order);
+					} else if (cell.getCellType() == CellType.STRING) {
+						String orderNumber = cell.getStringCellValue();
+						Order order = new Order(orderNumber);
+						readColumn(cell.getColumnIndex(), allSheet, order);
+						orders.add(order);
 					}
 				}
 			}
