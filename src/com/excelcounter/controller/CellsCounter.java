@@ -199,8 +199,7 @@ public class CellsCounter {
 	}
 
 	private void readMain(File all) {
-		try {
-			FileInputStream allFileInputStream = new FileInputStream(all);
+		try (FileInputStream allFileInputStream = new FileInputStream(all)) {
 			XSSFWorkbook allWorkBook = new XSSFWorkbook(allFileInputStream);
 			XSSFSheet allSheet = allWorkBook.getSheetAt(0);
 
@@ -228,13 +227,24 @@ public class CellsCounter {
 						DataFormatter formatter = new DataFormatter();
 						String orderNumber = formatter.formatCellValue(cell);
 
-						//костыль
-						//todo ебучий ноль вываливается, ебучая запятая добавляется
+						//todo ебучий ноль вываливается, ебучая запятая добавляется, лютый говнокод
 						StringBuilder sb = new StringBuilder(orderNumber);
 						if (orderNumber.contains("765")) {
-							sb.insert(orderNumber.indexOf('-') + 1,"0");
+							sb.insert(orderNumber.indexOf('-') + 1, "0");
 						} else if (orderNumber.contains("753")) {
-							sb.insert(orderNumber.indexOf('П') + 1,"0");
+							sb.insert(orderNumber.indexOf('П') + 1, "0");
+						}
+
+						orderNumber = sb.toString().replaceAll(",", "");
+						for (Order o : orders) {
+							if (o.getName().equals(orderNumber)) {
+								sb = new StringBuilder(orderNumber);
+								if (cell.getNumericCellValue() == 765) {
+									sb.insert(11, "0");
+								} else {
+									sb.insert(12, "0");
+								}
+							}
 						}
 						orderNumber = sb.toString().replaceAll(",", "");
 
@@ -244,8 +254,6 @@ public class CellsCounter {
 					}
 				}
 			}
-
-			allFileInputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -297,15 +305,23 @@ public class CellsCounter {
 	}
 
 	private void writeResultTo765Table(File table) {
-		try (FileInputStream tableFileInputStream = new FileInputStream(table);) {
+		try (FileInputStream tableFileInputStream = new FileInputStream(table)) {
 			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
-			XSSFSheet tableSheet = tableWorkbook.getSheetAt(0);
+			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
 
-			for (int i = 4; i < 70; i++) {
+			for (int i = 4; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
 				Cell orderCell = row.getCell(1);
 
 				for (Order order : orders) {
+					//todo fix this bad solution
+					//null row NEP protection
+					try {
+						orderCell.getCellType();
+					} catch (NullPointerException e) {
+						break;
+					}
+
 					if (orderCell.getCellType() == CellType.STRING
 							&& orderCell.getStringCellValue().contains(order.getName())) {
 						for (Department department : order.getDepartments()) {
@@ -320,11 +336,7 @@ public class CellsCounter {
 									row.getCell(7).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case OMZK: {
-									row.getCell(4).setCellValue(department.getYellowCellsCount());
-									row.getCell(8).setCellValue(department.getRedCellsCount());
-									break;
-								}
+								case OMZK:
 								case OMZK_new: {
 									row.getCell(4).setCellValue(department.getYellowCellsCount());
 									row.getCell(8).setCellValue(department.getRedCellsCount());
@@ -378,16 +390,23 @@ public class CellsCounter {
 	}
 
 	private void writeResultTo753Table(File table) {
-		try {
-			FileInputStream tableFileInputStream = new FileInputStream(table);
+		try (FileInputStream tableFileInputStream = new FileInputStream(table)) {
 			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
-			XSSFSheet tableSheet = tableWorkbook.getSheetAt(0);
+			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
 
-			for (int i = 4; i < 50; i++) {
+			for (int i = 4; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
 				Cell orderCell = row.getCell(1);
 
 				for (Order order : orders) {
+					//todo fix this bad solution
+					//null row NEP protection
+					try {
+						orderCell.getCellType();
+					} catch (NullPointerException e) {
+						break;
+					}
+
 					if (orderCell.getCellType() == CellType.STRING
 							&& orderCell.getStringCellValue().contains(order.getName())) {
 						for (Department department : order.getDepartments()) {
@@ -402,11 +421,7 @@ public class CellsCounter {
 									row.getCell(7).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case OMZK: {
-									row.getCell(4).setCellValue(department.getYellowCellsCount());
-									row.getCell(8).setCellValue(department.getRedCellsCount());
-									break;
-								}
+								case OMZK:
 								case OMZK_new: {
 									row.getCell(4).setCellValue(department.getYellowCellsCount());
 									row.getCell(8).setCellValue(department.getRedCellsCount());
@@ -465,16 +480,24 @@ public class CellsCounter {
 	}
 
 	private void writeResultToOrdersTable(File table) {
-		try {
-			FileInputStream tableFileInputStream = new FileInputStream(table);
+		try (FileInputStream tableFileInputStream = new FileInputStream(table)) {
 			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
 			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
 
-			for (int i = 3; i < 200; i++) {
+			for (int i = 3; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
+
 				Cell orderCell = row.getCell(2);
 
 				for (Order order : orders) {
+					//todo fix this bad solution
+					//null row NEP protection
+					try {
+						orderCell.getCellType();
+					} catch (NullPointerException e) {
+						break;
+					}
+
 					if (orderCell.getCellType() == CellType.STRING
 							&& orderCell.getStringCellValue().contains(order.getName())) {
 						for (Department department : order.getDepartments()) {
@@ -489,11 +512,7 @@ public class CellsCounter {
 									row.getCell(4).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case OMZK: {
-									row.getCell(8).setCellValue(department.getYellowCellsCount());
-									row.getCell(5).setCellValue(department.getRedCellsCount());
-									break;
-								}
+								case OMZK:
 								case OMZK_new: {
 									row.getCell(8).setCellValue(department.getYellowCellsCount());
 									row.getCell(5).setCellValue(department.getRedCellsCount());
@@ -546,6 +565,13 @@ public class CellsCounter {
 				}
 
 				for (OrderSbyt orderSbyt : ordersSbyt) {
+					//todo fix this bad solution
+					//null row NEP protection
+					try {
+						orderCell.getCellType();
+					} catch (NullPointerException e) {
+						break;
+					}
 					if (orderCell.getCellType() == CellType.STRING
 							&& orderCell.getStringCellValue().contains(orderSbyt.getName())) {
 						row.getCell(35).setCellValue(orderSbyt.getRedCells());
