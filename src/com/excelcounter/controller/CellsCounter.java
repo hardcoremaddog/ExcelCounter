@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class CellsCounter {
@@ -309,6 +311,8 @@ public class CellsCounter {
 			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
 			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
 
+			writeDateOfNow(tableSheet);
+
 			for (int i = 4; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
 				Cell orderCell = row.getCell(1);
@@ -393,6 +397,8 @@ public class CellsCounter {
 		try (FileInputStream tableFileInputStream = new FileInputStream(table)) {
 			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
 			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
+
+			writeDateOfNow(tableSheet);
 
 			for (int i = 4; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
@@ -483,6 +489,8 @@ public class CellsCounter {
 		try (FileInputStream tableFileInputStream = new FileInputStream(table)) {
 			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
 			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
+
+			writeDateOfNow(tableSheet);
 
 			for (int i = 3; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
@@ -583,6 +591,13 @@ public class CellsCounter {
 				IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void writeDateOfNow(XSSFSheet tableSheet) {
+		Cell dateCell = tableSheet.getRow(0).getCell(0);
+		LocalDate dateTime = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		dateCell.setCellValue(dateTime.format(formatter));
 	}
 
 	private void recalculateAndWrite(XSSFWorkbook workbook) throws IOException {
