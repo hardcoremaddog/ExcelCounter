@@ -19,6 +19,8 @@ import java.util.ArrayList;
 public class CellsCounter {
 	GUI gui;
 
+	private boolean win95colors;
+
 	private File all;
 	private File table;
 	private File sbyt = null;
@@ -59,7 +61,9 @@ public class CellsCounter {
 		this.gui = gui;
 	}
 
-	public void run(int param, boolean showResult) {
+	public void run(int param, boolean showResult, boolean win95colors) {
+		this.win95colors = win95colors;
+
 		if (all != null) {
 			readMain(all);
 
@@ -284,8 +288,20 @@ public class CellsCounter {
 			XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
 			XSSFFont font = cs.getFont();
 
-			String redARGBHEX = "FFFFC0CB";
-			String yellowARGBHEX = "FFFFEC8B";
+			String redARGBHEX;
+			String yellowARGBHEX;
+
+			if (cell.getCellType() != CellType.BLANK) {
+				System.out.println(cs.getFillForegroundColorColor().getARGBHex());
+			}
+
+			if (win95colors) {
+				redARGBHEX = "00FFFFC0";
+				yellowARGBHEX = "00DD9CB3";
+			} else {
+				redARGBHEX = "FFFFC0CB";
+				yellowARGBHEX = "FFFFEC8B";
+			}
 
 			if (cell.getCellType() != CellType.BLANK) {
 				if (cs.getFillForegroundColorColor().getARGBHex().equals(redARGBHEX)) {

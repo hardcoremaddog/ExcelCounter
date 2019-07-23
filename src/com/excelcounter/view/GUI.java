@@ -33,6 +33,7 @@ public class GUI extends JFrame {
 	private JRadioButton tableOrdersRadio = new JRadioButton("Заказы");
 
 	private JCheckBox check = new JCheckBox("Вывести результат подсчета в консоль", true);
+	private JCheckBox win95colors = new JCheckBox("Win95 cell colors", false);
 
 	private JButton startWork = new JButton("Посчитать и записать");
 
@@ -71,16 +72,20 @@ public class GUI extends JFrame {
 		advancedGUIShowButton.setDefaultCapable(true);
 		startWork.addActionListener(new CountButtonEventListener(this));
 		container.add(check);
-		container.add(startWork);
+		container.add(win95colors);
 
-		//fakeLabels
 		progressBar.setStringPainted(true);
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(100);
 		container.add(progressBar);
 		container.add(new JLabel());
+		container.add(startWork);
 
-		container.add(advancedGUIShowButton);
+		//fakeLabels
+
+
+
+//		container.add(advancedGUIShowButton);
 	}
 
 	private void setXLSXFilter(JFileChooser fileChooser) {
@@ -169,7 +174,7 @@ public class GUI extends JFrame {
 			} else {
 				param = 1;
 			}
-			cellsCounter.run(param, gui.check.isSelected());
+			cellsCounter.run(param, gui.check.isSelected(), gui.win95colors.isSelected());
 		}
 	}
 
