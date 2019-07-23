@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class CellsCounter {
@@ -122,25 +124,8 @@ public class CellsCounter {
 		gui.progressBar.setValue(100);
 	}
 
-	private void recalculateFormulas(XSSFWorkbook workbook) {
-		FormulaEvaluator evaluator = workbook
-				.getCreationHelper()
-				.createFormulaEvaluator();
-		for (Sheet sheet : workbook) {
-			for (Row r : sheet) {
-				for (Cell c : r) {
-					if (c.getCellType() == CellType.FORMULA) {
-						evaluator.evaluateFormulaCell(c);
-					}
-				}
-			}
-		}
-	}
-
 	private void readSbyt(File sbyt) {
-		try {
-			FileInputStream sbytFileInputStream = new FileInputStream(sbyt);
-			XSSFWorkbook sbytWorkBook = new XSSFWorkbook(sbytFileInputStream);
+		try (XSSFWorkbook sbytWorkBook = new XSSFWorkbook(new FileInputStream(sbyt))) {
 			XSSFSheet sbytSheet = sbytWorkBook.getSheetAt(0);
 
 			for (int i = 3; i < sbytSheet.getPhysicalNumberOfRows(); i++) {
@@ -164,8 +149,6 @@ public class CellsCounter {
 					}
 				}
 			}
-
-			sbytFileInputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -203,8 +186,7 @@ public class CellsCounter {
 	}
 
 	private void readMain(File all) {
-		try (FileInputStream allFileInputStream = new FileInputStream(all)) {
-			XSSFWorkbook allWorkBook = new XSSFWorkbook(allFileInputStream);
+		try (XSSFWorkbook allWorkBook = new XSSFWorkbook(new FileInputStream(all))) {
 			XSSFSheet allSheet = allWorkBook.getSheetAt(0);
 
 			Row row = allSheet.getRow(0);
@@ -321,9 +303,10 @@ public class CellsCounter {
 	}
 
 	private void writeResultTo765Table(File table) {
-		try (FileInputStream tableFileInputStream = new FileInputStream(table)) {
-			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
+		try (XSSFWorkbook tableWorkbook = new XSSFWorkbook(new FileInputStream(table))) {
 			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
+
+			writeDateOfNow(tableSheet);
 
 			for (int i = 4; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
@@ -406,9 +389,10 @@ public class CellsCounter {
 	}
 
 	private void writeResultTo753Table(File table) {
-		try (FileInputStream tableFileInputStream = new FileInputStream(table)) {
-			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
+		try (XSSFWorkbook tableWorkbook = new XSSFWorkbook(new FileInputStream(table))) {
 			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
+
+			writeDateOfNow(tableSheet);
 
 			for (int i = 4; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
@@ -496,9 +480,10 @@ public class CellsCounter {
 	}
 
 	private void writeResultToOrdersTable(File table) {
-		try (FileInputStream tableFileInputStream = new FileInputStream(table)) {
-			XSSFWorkbook tableWorkbook = new XSSFWorkbook(tableFileInputStream);
+		try (XSSFWorkbook tableWorkbook = new XSSFWorkbook(new FileInputStream(table))) {
 			XSSFSheet tableSheet = tableWorkbook.getSheet("Сводная таблица");
+
+			writeDateOfNow(tableSheet);
 
 			for (int i = 3; i < tableSheet.getPhysicalNumberOfRows(); i++) {
 				Row row = tableSheet.getRow(i);
@@ -601,13 +586,35 @@ public class CellsCounter {
 		}
 	}
 
-	private void recalculateAndWrite(XSSFWorkbook workbook) throws IOException {
+	private void writeDateOfNow(XSSFSheet tableSheet) {
+		Cell dateCell = tableSheet.getRow(0).getCell(0);
+		LocalDate dateTime = LocalDate.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		dateCell.setCellValue(dateTime.format(formatter));
+	}
+
+	private void recalculateFormulas(XSSFWorkbook workbook) {
+		FormulaEvaluator evaluator = workbook
+				.getCreationHelper()
+				.createFormulaEvaluator();
+		for (Sheet sheet : workbook) {
+			for (Row r : sheet) {
+				for (Cell c : r) {
+					if (c.getCellType() == CellType.FORMULA) {
+						evaluator.evaluateFormulaCell(c);
+					}
+				}
+			}
+		}
+	}
+
+	private void recalculateAndWrite(XSSFWorkbook workbook) {
 		recalculateFormulas(workbook);
 
-		FileOutputStream tableFileOutputStream = new FileOutputStream(table);
-		workbook.write(tableFileOutputStream);
-
-		workbook.close();
-		tableFileOutputStream.close();
+		try (FileOutputStream tableFileOutputStream = new FileOutputStream(table)) {
+			workbook.write(tableFileOutputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
