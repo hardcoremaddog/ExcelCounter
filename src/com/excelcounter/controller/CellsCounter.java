@@ -494,9 +494,8 @@ public class CellsCounter {
 					} catch (NullPointerException e) {
 						break;
 					}
-
 					if (orderCell.getCellType() == CellType.STRING
-							&& orderCell.getStringCellValue().contains(order.getName())) {
+							&& order.getName().contains(orderCell.getStringCellValue())) {
 						for (Department department : order.getDepartments()) {
 							switch (department.getName()) {
 								case UVK: {
