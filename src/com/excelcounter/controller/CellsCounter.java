@@ -273,10 +273,6 @@ public class CellsCounter {
 			String redARGBHEX;
 			String yellowARGBHEX;
 
-			if (cell.getCellType() != CellType.BLANK) {
-				System.out.println(cs.getFillForegroundColorColor().getARGBHex());
-			}
-
 			if (win95colors) {
 				redARGBHEX = "00FFFFC0";
 				yellowARGBHEX = "00DD9CB3";
