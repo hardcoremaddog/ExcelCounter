@@ -499,60 +499,60 @@ public class CellsCounter {
 						for (Department department : order.getDepartments()) {
 							switch (department.getName()) {
 								case UVK: {
-									row.getCell(6).setCellValue(department.getYellowCellsCount());
-									row.getCell(3).setCellValue(department.getRedCellsCount());
-									break;
-								}
-								case OMO: {
 									row.getCell(7).setCellValue(department.getYellowCellsCount());
 									row.getCell(4).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case OMZK:
-								case OMZK_new: {
+								case OMO: {
 									row.getCell(8).setCellValue(department.getYellowCellsCount());
 									row.getCell(5).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case TSEH_5: {
-									row.getCell(27).setCellValue(department.getYellowCellsCount());
-									row.getCell(19).setCellValue(department.getRedCellsCount());
+								case OMZK:
+								case OMZK_new: {
+									row.getCell(9).setCellValue(department.getYellowCellsCount());
+									row.getCell(6).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case TSEH_10: {
+								case TSEH_5: {
 									row.getCell(28).setCellValue(department.getYellowCellsCount());
 									row.getCell(20).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case TSEH_51: {
+								case TSEH_10: {
 									row.getCell(29).setCellValue(department.getYellowCellsCount());
 									row.getCell(21).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case TSEH_121: {
+								case TSEH_51: {
 									row.getCell(30).setCellValue(department.getYellowCellsCount());
 									row.getCell(22).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case TSEH_217: {
+								case TSEH_121: {
 									row.getCell(31).setCellValue(department.getYellowCellsCount());
 									row.getCell(23).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case TSEH_317: {
+								case TSEH_217: {
 									row.getCell(32).setCellValue(department.getYellowCellsCount());
 									row.getCell(24).setCellValue(department.getRedCellsCount());
 									break;
 								}
-								case TSEH_416: {
+								case TSEH_317: {
 									row.getCell(33).setCellValue(department.getYellowCellsCount());
 									row.getCell(25).setCellValue(department.getRedCellsCount());
 									break;
 								}
-
-								case TSEH_517: {
+								case TSEH_416: {
 									row.getCell(34).setCellValue(department.getYellowCellsCount());
 									row.getCell(26).setCellValue(department.getRedCellsCount());
+									break;
+								}
+
+								case TSEH_517: {
+									row.getCell(35).setCellValue(department.getYellowCellsCount());
+									row.getCell(27).setCellValue(department.getRedCellsCount());
 									break;
 								}
 							}
@@ -570,7 +570,7 @@ public class CellsCounter {
 					}
 					if (orderCell.getCellType() == CellType.STRING
 							&& orderCell.getStringCellValue().contains(orderSbyt.getName())) {
-						row.getCell(35).setCellValue(orderSbyt.getRedCells());
+						row.getCell(36).setCellValue(orderSbyt.getRedCells());
 					}
 				}
 			}
