@@ -569,7 +569,7 @@ public class CellsCounter {
 						break;
 					}
 					if (orderCell.getCellType() == CellType.STRING
-							&& orderCell.getStringCellValue().contains(orderSbyt.getName())) {
+							&& orderCell.getStringCellValue().trim().equals(orderSbyt.getName().trim())) {
 						row.getCell(36).setCellValue(orderSbyt.getRedCells());
 					}
 				}
