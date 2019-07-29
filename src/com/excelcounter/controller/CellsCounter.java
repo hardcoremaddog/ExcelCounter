@@ -318,7 +318,7 @@ public class CellsCounter {
 					}
 
 					if (orderCell.getCellType() == CellType.STRING
-							&& orderCell.getStringCellValue().contains(order.getName())) {
+							&& orderCell.getStringCellValue().trim().equals(order.getName().trim())) {
 						for (Department department : order.getDepartments()) {
 							switch (department.getName()) {
 								case UVK: {
@@ -404,7 +404,7 @@ public class CellsCounter {
 					}
 
 					if (orderCell.getCellType() == CellType.STRING
-							&& orderCell.getStringCellValue().contains(order.getName())) {
+							&& orderCell.getStringCellValue().trim().equals(order.getName().trim())) {
 						for (Department department : order.getDepartments()) {
 							switch (department.getName()) {
 								case UVK: {
