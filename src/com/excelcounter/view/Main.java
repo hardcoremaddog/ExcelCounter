@@ -8,6 +8,7 @@ import java.io.IOException;
 public class Main {
 //	private static File all;
 //	private static File table;
+	public static final String VERSION = "0.7a";
 
 	public static void main(String[] args) throws IOException {
 		try {
@@ -19,7 +20,7 @@ public class Main {
 		GUI app = new GUI();
 		app.setVisible(true);
 
-		System.out.println("ExcelCounter v0.6a" +
+		System.out.println("ExcelCounter " +  VERSION +
 				"\nby Alexey Zheludov" +
 				"\nCopyright (c) 2019 MDDG Software, All rights reserved.\n" +
 

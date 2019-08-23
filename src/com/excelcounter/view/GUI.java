@@ -40,7 +40,7 @@ public class GUI extends JFrame {
 	public JProgressBar progressBar = new JProgressBar();
 
 	GUI() {
-		super("ExcelCounter v0.6a");
+		super("ExcelCounter " + Main.VERSION);
 		this.setBounds(100, 100, 900, 350);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -77,15 +77,9 @@ public class GUI extends JFrame {
 		progressBar.setStringPainted(true);
 		progressBar.setMinimum(0);
 		progressBar.setMaximum(100);
+		container.add(advancedGUIShowButton);
 		container.add(progressBar);
-		container.add(new JLabel());
 		container.add(startWork);
-
-		//fakeLabels
-
-
-
-//		container.add(advancedGUIShowButton);
 	}
 
 	private void setXLSXFilter(JFileChooser fileChooser) {
@@ -106,12 +100,13 @@ public class GUI extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			progressBar.setValue(0);
 			JFileChooser allFileChooser = new JFileChooser();
+			allFileChooser.setMultiSelectionEnabled(false);
 			setXLSXFilter(allFileChooser);
 			int ret = allFileChooser.showDialog(null, "Выбрать файл книги с данными");
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				checkFile(allFileChooser);
 				all = allFileChooser.getSelectedFile();
-				allFilePathLabel.setText(all.getAbsolutePath());
+				allFilePathLabel.setText(all.getName());
 			}
 		}
 	}
@@ -126,7 +121,7 @@ public class GUI extends JFrame {
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				checkFile(sbytFileChooser);
 				sbyt = sbytFileChooser.getSelectedFile();
-				sbytFilePathLaber.setText(sbyt.getAbsolutePath());
+				sbytFilePathLaber.setText(sbyt.getName());
 			}
 		}
 	}
@@ -141,7 +136,7 @@ public class GUI extends JFrame {
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				checkFile(tableFileChooser);
 				table = tableFileChooser.getSelectedFile();
-				tableFilePathLabel.setText(table.getAbsolutePath());
+				tableFilePathLabel.setText(table.getName());
 			}
 		}
 	}
@@ -155,7 +150,6 @@ public class GUI extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
 			CellsCounter cellsCounter;
 			if (all == null && sbyt == null) {
 				System.out.println("Необходимо выбрать по крайней мере один файл книги с данными!");
