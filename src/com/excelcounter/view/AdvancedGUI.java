@@ -23,20 +23,22 @@ public class AdvancedGUI extends JFrame {
 	private AdvancedGUI advancedGUI = this;
 
 	private List<File> directories = new ArrayList<>();
-	private List<File> files = new ArrayList<>();
+    private List<File> filesForRepeat = new ArrayList<>();
+	private List<File> filesForPareto = new ArrayList<>();
 	private File table;
 
 	public JProgressBar progressBar = new JProgressBar();
 
 	private JButton mainGUIShowButton = new JButton("Вернуться на основной интерфейс");
 
-	private JButton allFileChooserButton = new JButton("Выбрать книги .xlsx со сводными таблицами");
+	private JButton tablesFileChooserButton = new JButton("Выбрать книги .xlsx с данными");
 	private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx/.xlsm с таблицей для записи данных");
 
+    private JRadioButton repeatRadio = new JRadioButton("Анализ повторений");
 	private JRadioButton paretoRadio = new JRadioButton("Парето");
-	private JRadioButton repeatRadio = new JRadioButton("Анализ повторений");
 
-	private JLabel allFilePathLabel = new JLabel();
+
+	private JLabel tablesFilePathLabel = new JLabel();
 	private JLabel tableFilePathLabel = new JLabel();
 
 	private JButton startWork = new JButton("Посчитать и записать");
@@ -47,14 +49,14 @@ public class AdvancedGUI extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		Container container = this.getContentPane();
-		container.setLayout(new GridLayout(5, 4, 1, 1));
+		container.setLayout(new GridLayout(5, 2, 1, 1));
 
 		mainGUIShowButton.addActionListener(new MainGUIShowButton());
-		allFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
+		tablesFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
 		tableFileChooseButton.addActionListener(new TableFileChooseButtonActionListener());
 		startWork.addActionListener(new CountButtonEventListener(this));
 
-		paretoRadio.setSelected(true);
+		repeatRadio.setSelected(true);
 
 		ButtonGroup group = new ButtonGroup();
 		group.add(paretoRadio);
@@ -65,12 +67,12 @@ public class AdvancedGUI extends JFrame {
 		progressBar.setMaximum(100);
 		container.add(mainGUIShowButton);
 		container.add(new JLabel());
-		container.add(allFileChooserButton);
-		container.add(allFilePathLabel);
+		container.add(tablesFileChooserButton);
+		container.add(tablesFilePathLabel);
 		container.add(tableFileChooseButton);
 		container.add(tableFilePathLabel);
+        container.add(repeatRadio);
 		container.add(paretoRadio);
-		container.add(repeatRadio);
 		container.add(startWork);
 
 		container.add(progressBar);
@@ -80,7 +82,7 @@ public class AdvancedGUI extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			progressBar.setValue(0);
-			files.clear();
+			filesForPareto.clear();
 			JFileChooser allFileChooser = new JFileChooser();
 			allFileChooser.setMultiSelectionEnabled(true);
 			allFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -89,9 +91,15 @@ public class AdvancedGUI extends JFrame {
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				directories = Arrays.asList(allFileChooser.getSelectedFiles());
 				if (directories.size() > 0) {
-					allFilePathLabel.setText("Файлы выбраны.");
+					tablesFilePathLabel.setText("Файлы выбраны.");
 
 					MyFileVisitor myFileVisitor = new MyFileVisitor();
+
+					if (repeatRadio.isSelected()) {
+                        myFileVisitor.setPartOfName("Производство");
+                    } else if (paretoRadio.isSelected()) {
+					    myFileVisitor.setPartOfName("Сводная");
+                    }
 
 					for (File file : directories) {
 						try {
@@ -101,7 +109,7 @@ public class AdvancedGUI extends JFrame {
 						}
 					}
 				} else {
-					allFilePathLabel.setText("Файлы не выбраны!");
+					tablesFilePathLabel.setText("Файлы не выбраны!");
 				}
 			}
 		}
@@ -122,12 +130,20 @@ public class AdvancedGUI extends JFrame {
 	}
 
 	public class MyFileVisitor extends SimpleFileVisitor<Path> {
-		String partOfName = "Сводная";
+		private String partOfName;
 
-		@Override
+        public void setPartOfName(String partOfName) {
+            this.partOfName = partOfName;
+        }
+
+        @Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 			if (partOfName != null && file.getFileName().toString().contains(partOfName)) {
-				files.add(file.toFile());
+			    if (paretoRadio.isSelected()) {
+                    filesForPareto.add(file.toFile());
+                } else if (repeatRadio.isSelected()) {
+			        filesForRepeat.add(file.toFile());
+                }
 			}
 			return FileVisitResult.CONTINUE;
 		}
@@ -157,24 +173,25 @@ public class AdvancedGUI extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			CellsCounter cellsCounter;
-			if (files.size() == 0 || directories.size() == 0) {
-				System.out.println("Необходимо выбрать по крайней мере один файл книги с данными!");
-				return;
-			} else {
-				cellsCounter = new CellsCounter(files, directories, table, advancedGUI);
-			}
+		    String errMsg = "Необходимо выбрать по крайней мере один файл книги с данными!";
 
-			int param;
+			CellsCounter cellsCounter;
 
 			if (paretoRadio.isSelected()) {
-				param = 4;
-			} else if (repeatRadio.isSelected()) {
-				param = 5;
-				cellsCounter.run(param, true, false);
-			}
-
-			cellsCounter.run(4, true, false);
+                if (filesForPareto.size() == 0 || directories.size() == 0) {
+                    System.out.println(errMsg);
+                } else {
+                    cellsCounter = new CellsCounter(filesForPareto, directories, table, advancedGUI);
+                    cellsCounter.run(4, true, false);
+                }
+            } else if (repeatRadio.isSelected()) {
+                if (filesForRepeat.size() == 0 || directories.size() == 0) {
+                    System.out.println(errMsg);
+                } else {
+                    cellsCounter = new CellsCounter(filesForRepeat, directories, table, advancedGUI);
+                    cellsCounter.run(5, true, false);
+                }
+            }
 		}
 	}
 }

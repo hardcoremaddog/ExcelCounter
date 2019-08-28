@@ -1,5 +1,8 @@
 package com.excelcounter.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Day {
 
     private String dayNumber;
@@ -8,8 +11,15 @@ public class Day {
     private int tmcCount;
     private int dseCount;
 
+    private List<Department> departmentList;
+
     public Day(String dayNumber) {
         this.dayNumber = dayNumber;
+        this.departmentList = new ArrayList<>();
+    }
+
+    public List<Department> getDepartmentList() {
+        return departmentList;
     }
 
     public String getFileName() {

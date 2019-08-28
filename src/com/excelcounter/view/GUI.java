@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class GUI extends JFrame {
+
 	private GUI gui = this;
 
 	private File all;
@@ -31,6 +32,11 @@ public class GUI extends JFrame {
 	private JRadioButton table765Radio = new JRadioButton("765");
 	private JRadioButton table753Radio = new JRadioButton("753");
 	private JRadioButton tableOrdersRadio = new JRadioButton("Заказы");
+
+
+	public JCheckBox getCheck() {
+		return check;
+	}
 
 	private JCheckBox check = new JCheckBox("Вывести результат подсчета в консоль", true);
 	private JCheckBox win95colors = new JCheckBox("Win95 cell colors", false);

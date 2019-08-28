@@ -1,33 +1,43 @@
 package com.excelcounter.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Department {
 
-	private String name;
+    private String name;
 
-	private int redCellsCount;
-	private int yellowCellsCount;
+    private int redCellsCount;
+    private int yellowCellsCount;
 
-	public Department(String name) {
-		this.name = name;
-	}
+    private Map<String, Integer> dseRepeatCountMap;
 
-	public String getName() {
-		return name;
-	}
+    public Department(String name) {
+        this.name = name;
+        this.dseRepeatCountMap = new HashMap<>();
+    }
 
-	public int getRedCellsCount() {
-		return redCellsCount;
-	}
+    public Map<String, Integer> getDseRepeatCountMap() {
+        return dseRepeatCountMap;
+    }
 
-	public void setRedCellsCount(int redCellsCount) {
-		this.redCellsCount = redCellsCount;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public int getYellowCellsCount() {
-		return yellowCellsCount;
-	}
+    public int getRedCellsCount() {
+        return redCellsCount;
+    }
 
-	public void setYellowCellsCount(int yellowCellsCount) {
-		this.yellowCellsCount = yellowCellsCount;
-	}
+    public void setRedCellsCount(int redCellsCount) {
+        this.redCellsCount = redCellsCount;
+    }
+
+    public int getYellowCellsCount() {
+        return yellowCellsCount;
+    }
+
+    public void setYellowCellsCount(int yellowCellsCount) {
+        this.yellowCellsCount = yellowCellsCount;
+    }
 }
