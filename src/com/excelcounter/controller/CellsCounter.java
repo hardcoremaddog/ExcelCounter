@@ -1,7 +1,6 @@
 package com.excelcounter.controller;
 
 import com.excelcounter.model.*;
-import com.excelcounter.util.MapUtil;
 import com.excelcounter.view.AdvancedGUI;
 import com.excelcounter.view.GUI;
 import org.apache.poi.ss.usermodel.*;
@@ -10,12 +9,17 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 public class CellsCounter {
     GUI gui;
@@ -26,8 +30,10 @@ public class CellsCounter {
     private List<File> allFiles;
     private List<File> directories;
     private List<Day> days = new ArrayList<>();
+    private List<ExcelFile> excelFiles = new ArrayList<>();
 
     private File all;
+    private File allNomenclatureTableFile;
     private File table;
     private File sbyt = null;
     private List<Order> orders = new ArrayList<>();
@@ -49,7 +55,24 @@ public class CellsCounter {
     private final String OMO = "Отдел материального обеспечения";
     private final String MMZ02 = "02ММЗ ММЗ Цех 02";
 
-    private List<Department> departmentsListFull = new ArrayList<>();
+    private List<Department> departmentListFull = new ArrayList<>();
+
+    private void initDepartmentsList() {
+        departmentListFull.add(new Department(TSEH_5));
+        departmentListFull.add(new Department(TSEH_10));
+        departmentListFull.add(new Department(TSEH_51));
+        departmentListFull.add(new Department(TSEH_121));
+        departmentListFull.add(new Department(TSEH_217));
+        departmentListFull.add(new Department(TSEH_317));
+        departmentListFull.add(new Department(TSEH_417));
+        departmentListFull.add(new Department(TSEH_517));
+        departmentListFull.add(new Department(VVMMZ));
+        departmentListFull.add(new Department(UVK));
+        departmentListFull.add(new Department(OMZK));
+        departmentListFull.add(new Department(OMZK_new));
+        departmentListFull.add(new Department(OMO));
+        departmentListFull.add(new Department(MMZ02));
+    }
 
     public CellsCounter(File all, GUI gui) {
         this.all = all;
@@ -69,29 +92,12 @@ public class CellsCounter {
         this.gui = gui;
     }
 
-    public CellsCounter(List<File> allFiles, List<File> directories, File table, AdvancedGUI advancedGUI) {
+    public CellsCounter(List<File> allFiles, List<File> directories, File allNomenclatureTableFile, AdvancedGUI advancedGUI) {
         initDepartmentsList();
         this.allFiles = allFiles;
         this.directories = directories;
-        this.table = table;
+        this.allNomenclatureTableFile = allNomenclatureTableFile;
         this.advancedGUI = advancedGUI;
-    }
-
-    private void initDepartmentsList() {
-        this.departmentsListFull.add(new Department(TSEH_5));
-        this.departmentsListFull.add(new Department(TSEH_10));
-        this.departmentsListFull.add(new Department(TSEH_51));
-        this.departmentsListFull.add(new Department(TSEH_121));
-        this.departmentsListFull.add(new Department(TSEH_217));
-        this.departmentsListFull.add(new Department(TSEH_317));
-        this.departmentsListFull.add(new Department(TSEH_417));
-        this.departmentsListFull.add(new Department(TSEH_517));
-        this.departmentsListFull.add(new Department(VVMMZ));
-        this.departmentsListFull.add(new Department(UVK));
-        this.departmentsListFull.add(new Department(OMZK));
-        this.departmentsListFull.add(new Department(OMZK_new));
-        this.departmentsListFull.add(new Department(OMO));
-        this.departmentsListFull.add(new Department(MMZ02));
     }
 
     public void run(int param, boolean showResult, boolean win95colors) {
@@ -103,6 +109,7 @@ public class CellsCounter {
             }
 
             if (param == 5) {
+                readMainWithDSE(allNomenclatureTableFile);
                 readMainWithDSE(allFiles);
             }
         }
@@ -148,17 +155,10 @@ public class CellsCounter {
                 if (param == 4) {
                     directories.sort(Comparator.comparing(File::getName));
 
-                    //TODO fix non-dates period show
-//                String firstDirectoryName = directories.get(0).getName();
-//                String lastDirectoryName = directories.get(directories.size() - 1).getName();
-//                String leafName = firstDirectoryName + "-" + lastDirectoryName
-//                System.out.println("\nСформирован отчет за период: " + leafName);
-
                     for (Day day : days) {
                         System.out.println("\n");
                         System.out.println("=====================");
                         System.out.println("Имя файла: " + day.getFileName());
-                        System.out.println("День номер: " + day.getDayNumber());
                         System.out.println("=====================");
                         System.out.println("--------------------------------");
                         System.out.println("ТМЦ: " + day.getTmcCount());
@@ -168,46 +168,16 @@ public class CellsCounter {
                 }
 
                 if (param == 5) {
-                    //print overall result and write to result.txt file
-                    StringBuilder sb = new StringBuilder();
-                    for (Department department : departmentsListFull) {
-
-                        if (department.getDseRepeatCountMap().size() > 0) {
-                            sb.append("\n \n");
-                            sb.append("\n-------------------------------------------");
-                            System.out.println("-------------------------------------------");
-                            sb.append("\n").append(department.getName());
-                            System.out.println(department.getName());
-                            sb.append("\n-------------------------------------------");
-                            System.out.println("-------------------------------------------");
-
-                            Map<String, Integer> sortedMap = department.getDseRepeatCountMap().entrySet().stream()
-                                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
-                            for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
-                                sb.append("\n").append(entry.getKey()).append(" [Кол-во повторений: ").append(entry.getValue()).append("]");
-                                System.out.println(entry.getKey() + " [Кол-во повторений: " + entry.getValue() + "]");
-                            }
-                        }
-                    }
-
                     try {
-                        //write to text file
-                        File textResult = new File("C:\\textResult.doc");
-                        BufferedWriter bw = new BufferedWriter(new FileWriter(textResult));
-                        bw.write(sb.toString());
-                        bw.close();
-                        System.out.println("\n\nРезультат подсчета записан в текстовый файл по пути: C:\\textResult.doc");
-
-                        //write to xlsx file
-                        File xlsxResult = new File("C:\\xlsxResult.xlsx");
-                        writeRepeatCountResultIntoExcel(xlsxResult);
-                        System.out.println("Результат подсчета записан в книгу Excel по пути: C:\\xlsxResult.xlsx");
+                        File resultFile = new File("C:\\xlsxResult.xlsx");
+                        Files.createFile(resultFile.toPath());
+                        writeIntoExcel(resultFile);
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
+
                 }
             }
         }
@@ -237,43 +207,68 @@ public class CellsCounter {
         }
     }
 
-    public void writeRepeatCountResultIntoExcel(File file) throws FileNotFoundException, IOException {
-        int rowCount = 0;
+    public static void writeIntoExcel(File file) throws IOException{
+        Workbook book = new XSSFWorkbook();
+        Sheet sheet = book.createSheet("Birthdays");
 
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("result");
+        // Нумерация начинается с нуля
+        Row row = sheet.createRow(0);
 
-        for (Department department : departmentsListFull) {
-            Row row = sheet.createRow(rowCount);
-            Cell departmentNameCell = row.createCell(0);
-            departmentNameCell.setCellValue(department.getName());
+        // Мы запишем имя и дату в два столбца
+        // имя будет String, а дата рождения --- Date,
+        // формата dd.mm.yyyy
+        Cell name = row.createCell(0);
+        name.setCellValue("John");
 
-            Map<String, Integer> sortedMap = department.getDseRepeatCountMap().entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        Cell birthdate = row.createCell(1);
 
-            for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
-                rowCount++;
+        DataFormat format = book.createDataFormat();
+        CellStyle dateStyle = book.createCellStyle();
+        dateStyle.setDataFormat(format.getFormat("dd.mm.yyyy"));
+        birthdate.setCellStyle(dateStyle);
 
-                Cell nomenclatureCell = sheet.createRow(rowCount).createCell(0);
-                Cell repeatCountCell = sheet.getRow(rowCount).createCell(1);
 
-                nomenclatureCell.setCellValue(entry.getKey());
-                repeatCountCell.setCellValue(entry.getValue());
-            }
-
-        }
+        // Нумерация лет начинается с 1900-го
+        birthdate.setCellValue(new Date(110, 10, 10));
 
         // Меняем размер столбца
         sheet.autoSizeColumn(1);
 
         // Записываем всё в файл
-        workbook.write(new FileOutputStream(file));
-        workbook.close();
+        book.write(new FileOutputStream(file));
+        book.close();
+    }
+
+    private void readMainWithDSE(File file) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file))) {
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+                Row row = sheet.getRow(i);
+
+                for (int j = 0; j < row.getPhysicalNumberOfCells(); j++) {
+                    Cell cell = row.getCell(j);
+
+                    XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
+                    XSSFFont font = cs.getFont();
+
+                    if (font.getBold() && font.getFontHeightInPoints() == 8 && cell.getCellType() == CellType.STRING) {
+                        String departmentName = cell.getStringCellValue();
+                        departmentListFull.add(new Department(departmentName));
+                        readDSE(i + 1, sheet, departmentName, new ExcelFile(file.getName()), false);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void readMainWithDSE(List<File> allFiles) {
         for (File file : allFiles) {
+
+            ExcelFile excelFile = new ExcelFile(file.getName());
+
             try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file))) {
                 XSSFSheet sheet = workbook.getSheetAt(0);
 
@@ -288,17 +283,21 @@ public class CellsCounter {
 
                         if (font.getBold() && font.getFontHeightInPoints() == 8 && cell.getCellType() == CellType.STRING) {
                             String departmentName = cell.getStringCellValue();
-                            readDSE(i + 1, sheet, departmentName);
+                            excelFile.getDepartmentList().add(new Department(departmentName));
+
+                            readDSE(i + 1, sheet, departmentName,  excelFile, true);
                         }
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            excelFiles.add(excelFile);
         }
     }
 
-    private void readDSE(int rowStart, XSSFSheet sheet, String departmentName) {
+    private void readDSE(int rowStart, XSSFSheet sheet, String departmentName, ExcelFile excelFile, boolean manyFiles) {
         for (int i = rowStart; i < sheet.getPhysicalNumberOfRows(); i++) {
 
             Cell dseVendorCell = sheet.getRow(i).getCell(0);
@@ -313,15 +312,20 @@ public class CellsCounter {
 
             DataFormatter formatter = new DataFormatter();
 
-            String vendorValue = formatter.formatCellValue(dseVendorCell);
+            String vendorValue = formatter.formatCellValue(dseVendorCell); //todo delete if no need
             String nomenclatureValue = formatter.formatCellValue(dseNomenclatureCell);
 
-            for (Department department : departmentsListFull) {
-                if (department.getName().equals(departmentName)) {
-                    Map<String, Integer> dseRepeatCountMap = department.getDseRepeatCountMap();
-                    if (dseRepeatCountMap.containsKey(nomenclatureValue)) {
-                        dseRepeatCountMap.put(nomenclatureValue, dseRepeatCountMap.get(nomenclatureValue) + 1);
-                    } else dseRepeatCountMap.put(nomenclatureValue, 1);
+            if (manyFiles) {
+                for (Department department : excelFile.getDepartmentList()) {
+                    if (department.getName().equals(departmentName)) {
+                        department.getDseList().add(nomenclatureValue);
+                    }
+                }
+            } else {
+                for (Department department : departmentListFull) {
+                    if (department.getName().equals(departmentName)) {
+                        department.getDseList().add(nomenclatureValue);
+                    }
                 }
             }
         }
@@ -400,7 +404,6 @@ public class CellsCounter {
                         DataFormatter formatter = new DataFormatter();
                         String orderNumber = formatter.formatCellValue(cell);
 
-                        //todo ебучий ноль вываливается, ебучая запятая добавляется, лютый говнокод
                         StringBuilder sb = new StringBuilder(orderNumber);
                         if (orderNumber.contains("765")) {
                             sb.insert(orderNumber.indexOf('-') + 1, "0");

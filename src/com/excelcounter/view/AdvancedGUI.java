@@ -25,21 +25,22 @@ public class AdvancedGUI extends JFrame {
 	private List<File> directories = new ArrayList<>();
     private List<File> filesForRepeat = new ArrayList<>();
 	private List<File> filesForPareto = new ArrayList<>();
-	private File table;
+
+	private File allNomenclatureTableFile;
 
 	public JProgressBar progressBar = new JProgressBar();
 
 	private JButton mainGUIShowButton = new JButton("Вернуться на основной интерфейс");
 
 	private JButton tablesFileChooserButton = new JButton("Выбрать книги .xlsx с данными");
-	private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx/.xlsm с таблицей для записи данных");
+	private JButton allNomenclatureTableFileChooseButton = new JButton("Выбрать книгу .xlsx с полным списком номенклатуры");
 
     private JRadioButton repeatRadio = new JRadioButton("Анализ повторений");
 	private JRadioButton paretoRadio = new JRadioButton("Парето");
 
 
 	private JLabel tablesFilePathLabel = new JLabel();
-	private JLabel tableFilePathLabel = new JLabel();
+	private JLabel allNomenclatureTableFilePathLabel = new JLabel();
 
 	private JButton startWork = new JButton("Посчитать и записать");
 
@@ -53,7 +54,7 @@ public class AdvancedGUI extends JFrame {
 
 		mainGUIShowButton.addActionListener(new MainGUIShowButton());
 		tablesFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
-		tableFileChooseButton.addActionListener(new TableFileChooseButtonActionListener());
+		allNomenclatureTableFileChooseButton.addActionListener(new AllNomenclatureTableFileChooseButtonActionListener());
 		startWork.addActionListener(new CountButtonEventListener(this));
 
 		repeatRadio.setSelected(true);
@@ -69,8 +70,8 @@ public class AdvancedGUI extends JFrame {
 		container.add(new JLabel());
 		container.add(tablesFileChooserButton);
 		container.add(tablesFilePathLabel);
-		container.add(tableFileChooseButton);
-		container.add(tableFilePathLabel);
+		container.add(allNomenclatureTableFileChooseButton);
+		container.add(allNomenclatureTableFilePathLabel);
         container.add(repeatRadio);
 		container.add(paretoRadio);
 		container.add(startWork);
@@ -115,16 +116,16 @@ public class AdvancedGUI extends JFrame {
 		}
 	}
 
-	class TableFileChooseButtonActionListener implements ActionListener {
+	class AllNomenclatureTableFileChooseButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			progressBar.setValue(0);
 			JFileChooser tableFileChooser = new JFileChooser();
 			setXLSXFilter(tableFileChooser);
-			int ret = tableFileChooser.showDialog(null, "Выбрать файл книги с таблицей");
+			int ret = tableFileChooser.showDialog(null, "Выбрать файл книги с полным списком номенклатуры");
 			if (ret == JFileChooser.APPROVE_OPTION) {
-				table = tableFileChooser.getSelectedFile();
-				tableFilePathLabel.setText(table.getName());
+				allNomenclatureTableFile = tableFileChooser.getSelectedFile();
+				allNomenclatureTableFilePathLabel.setText(allNomenclatureTableFile.getName());
 			}
 		}
 	}
@@ -173,24 +174,29 @@ public class AdvancedGUI extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-		    String errMsg = "Необходимо выбрать по крайней мере один файл книги с данными!";
+		    String errMsgAll = "Необходимо выбрать по крайней мере один файл книги с данными!";
+			String errMsgAllNomenclature = "Необходимо выбрать файл книги c полным списком номенклатуры!";
 
 			CellsCounter cellsCounter;
 
 			if (paretoRadio.isSelected()) {
                 if (filesForPareto.size() == 0 || directories.size() == 0) {
-                    System.out.println(errMsg);
+                    System.out.println(errMsgAll);
                 } else {
-                    cellsCounter = new CellsCounter(filesForPareto, directories, table, advancedGUI);
+                    cellsCounter = new CellsCounter(filesForPareto, directories, allNomenclatureTableFile, advancedGUI);
                     cellsCounter.run(4, true, false);
                 }
             } else if (repeatRadio.isSelected()) {
                 if (filesForRepeat.size() == 0 || directories.size() == 0) {
-                    System.out.println(errMsg);
+                    System.out.println(errMsgAll);
                 } else {
-                    cellsCounter = new CellsCounter(filesForRepeat, directories, table, advancedGUI);
-                    cellsCounter.run(5, true, false);
-                }
+					if (allNomenclatureTableFile == null) {
+						System.out.println(errMsgAllNomenclature);
+					} else {
+						cellsCounter = new CellsCounter(filesForRepeat, directories, allNomenclatureTableFile, advancedGUI);
+						cellsCounter.run(5, true, false);
+					}
+				}
             }
 		}
 	}

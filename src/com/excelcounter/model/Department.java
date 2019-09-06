@@ -1,24 +1,32 @@
 package com.excelcounter.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Department {
 
     private String name;
+    private String fileName;
 
     private int redCellsCount;
     private int yellowCellsCount;
 
-    private Map<String, Integer> dseRepeatCountMap;
+    private List<String> dseList = new ArrayList<>();
+
+    public List<String> getDseList() {
+        return dseList;
+    }
 
     public Department(String name) {
         this.name = name;
-        this.dseRepeatCountMap = new HashMap<>();
     }
 
-    public Map<String, Integer> getDseRepeatCountMap() {
-        return dseRepeatCountMap;
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getName() {
