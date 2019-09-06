@@ -168,16 +168,15 @@ public class CellsCounter {
                 }
 
                 if (param == 5) {
+                    File resultFile = new File("C:\\xlsxResult.xlsx");
                     try {
-                        File resultFile = new File("C:\\xlsxResult.xlsx");
-                        Files.createFile(resultFile.toPath());
                         writeIntoExcel(resultFile);
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-
+                    System.out.println("\nГотово!");
+                    System.out.println("Результат записан в файл по пути: " + resultFile.getAbsolutePath());
                 }
             }
         }
@@ -207,9 +206,25 @@ public class CellsCounter {
         }
     }
 
-    public static void writeIntoExcel(File file) throws IOException{
-        Workbook book = new XSSFWorkbook();
-        Sheet sheet = book.createSheet("Birthdays");
+    public void writeIntoExcel(File file) throws IOException {
+        XSSFWorkbook book;
+
+        if (!Files.exists(file.toPath())) {
+            Files.createFile(file.toPath());
+            book = new XSSFWorkbook();
+        } else {
+            FileInputStream fis = new FileInputStream(file);
+            book = new XSSFWorkbook(fis);
+        }
+
+        String sheetName = directories.get(0).getName() + "-" + directories.get(directories.size() - 1).getName();
+
+        XSSFSheet sheet;
+        if (book.getSheet(sheetName) != null) {
+            sheet = book.getSheet(sheetName);
+        } else {
+            sheet = book.createSheet(sheetName);
+        }
 
         // Нумерация начинается с нуля
         Row row = sheet.createRow(0);
@@ -227,7 +242,6 @@ public class CellsCounter {
         dateStyle.setDataFormat(format.getFormat("dd.mm.yyyy"));
         birthdate.setCellStyle(dateStyle);
 
-
         // Нумерация лет начинается с 1900-го
         birthdate.setCellValue(new Date(110, 10, 10));
 
@@ -235,9 +249,13 @@ public class CellsCounter {
         sheet.autoSizeColumn(1);
 
         // Записываем всё в файл
-        book.write(new FileOutputStream(file));
+        FileOutputStream fos = new FileOutputStream(file);
+        book.write(fos);
         book.close();
+
+        fos.close();
     }
+
 
     private void readMainWithDSE(File file) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file))) {
@@ -285,7 +303,7 @@ public class CellsCounter {
                             String departmentName = cell.getStringCellValue();
                             excelFile.getDepartmentList().add(new Department(departmentName));
 
-                            readDSE(i + 1, sheet, departmentName,  excelFile, true);
+                            readDSE(i + 1, sheet, departmentName, excelFile, true);
                         }
                     }
                 }
