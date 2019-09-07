@@ -877,17 +877,18 @@ public class CellsCounter {
 						Department fileDepartment = excelFile.getDepartmentList().stream()
 								.filter(d -> d.getName().equals(department.getName()))
 								.findAny()
-								.get();
+								.orElse(null);
 
-						boolean match = fileDepartment.getDseList().stream()
-								.anyMatch(n -> n.equals(nomenclature));
+						if (fileDepartment != null) {
+							boolean match = fileDepartment.getDseList().stream()
+									.anyMatch(n -> n.equals(nomenclature));
 
-						if (match) {
-							nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(1);
-						} else {
-							nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(0);
+							if (match) {
+								nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(1);
+							} else {
+								nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(0);
+							}
 						}
-
 					}
 				}
 			}
