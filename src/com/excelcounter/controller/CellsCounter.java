@@ -3,9 +3,11 @@ package com.excelcounter.controller;
 import com.excelcounter.model.*;
 import com.excelcounter.view.AdvancedGUI;
 import com.excelcounter.view.GUI;
-import org.apache.poi.ss.formula.functions.Column;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CellsCounter {
 	GUI gui;
@@ -101,83 +102,49 @@ public class CellsCounter {
 	public void run(int param, boolean showResult, boolean win95colors) {
 		this.win95colors = win95colors;
 
-		if (allFiles != null) {
-			if (param == 4) {
-				readTables(allFiles);
-			}
-
-			if (param == 5) {
-				readMainWithDSE(allNomenclatureTableFile);
-				readMainWithDSE(allFiles);
-			}
-		}
-
+		//all table red and yellow cells count
 		if (all != null) {
 			readMain(all);
+
+			if (showResult) {
+				if (all != null) {
+					for (Order order : orders) {
+						System.out.println("=====================");
+						System.out.println(order.getName());
+						System.out.println("=====================");
+						for (Department department : order.getDepartments()) {
+							System.out.println("--------------------------------");
+							System.out.println(department.getName());
+							System.out.println("Красных позиций: " + department.getRedCellsCount());
+							System.out.println("Желтых позиций: " + department.getYellowCellsCount());
+						}
+						System.out.println("--------------------------------");
+						System.out.println("\n \n \n");
+					}
+				}
+			}
 		}
 
+		//transfer to sbyt control count
 		if (sbyt != null) {
 			readSbyt(sbyt);
-		}
 
-		if (showResult) {
-			if (all != null) {
-				for (Order order : orders) {
-					System.out.println("=====================");
-					System.out.println(order.getName());
-					System.out.println("=====================");
-					for (Department department : order.getDepartments()) {
+			if (showResult) {
+				if (sbyt != null) {
+					for (OrderSbyt orderSbyt : ordersSbyt) {
+						System.out.println("=====================");
+						System.out.println(orderSbyt.getName());
+						System.out.println("=====================");
 						System.out.println("--------------------------------");
-						System.out.println(department.getName());
-						System.out.println("Красных позиций: " + department.getRedCellsCount());
-						System.out.println("Желтых позиций: " + department.getYellowCellsCount());
-					}
-					System.out.println("--------------------------------");
-					System.out.println("\n \n \n");
-				}
-			}
-
-			if (sbyt != null) {
-				for (OrderSbyt orderSbyt : ordersSbyt) {
-					System.out.println("=====================");
-					System.out.println(orderSbyt.getName());
-					System.out.println("=====================");
-					System.out.println("--------------------------------");
-					System.out.println("Непереданных поцизий: " + orderSbyt.getRedCells());
-					System.out.println("--------------------------------");
-					System.out.println("\n");
-				}
-			}
-
-			if (allFiles != null) {
-				if (param == 4) {
-					directories.sort(Comparator.comparing(File::getName));
-
-					for (Day day : days) {
+						System.out.println("Непереданных поцизий: " + orderSbyt.getRedCells());
+						System.out.println("--------------------------------");
 						System.out.println("\n");
-						System.out.println("=====================");
-						System.out.println("Имя файла: " + day.getFileName());
-						System.out.println("=====================");
-						System.out.println("--------------------------------");
-						System.out.println("ТМЦ: " + day.getTmcCount());
-						System.out.println("ДСЕ: " + day.getDseCount());
-						System.out.println("--------------------------------");
 					}
-				}
-
-				if (param == 5) {
-					File resultFile = new File("C:\\xlsxResult.xlsx");
-					try {
-						writeIntoExcel(resultFile);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					System.out.println("\nГотово!");
-					System.out.println("Результат записан в файл по пути: " + resultFile.getAbsolutePath());
 				}
 			}
 		}
 
+		//table type
 		if (table != null) {
 			switch (param) {
 				case 1: {
@@ -194,6 +161,44 @@ public class CellsCounter {
 				}
 			}
 		}
+
+		if (allFiles != null) {
+			//paretoTable
+			if (param == 4) {
+				readTables(allFiles);
+
+				directories.sort(Comparator.comparing(File::getName));
+
+				for (Day day : days) {
+					System.out.println("\n");
+					System.out.println("=====================");
+					System.out.println("Имя файла: " + day.getFileName());
+					System.out.println("=====================");
+					System.out.println("--------------------------------");
+					System.out.println("ТМЦ: " + day.getTmcCount());
+					System.out.println("ДСЕ: " + day.getDseCount());
+					System.out.println("--------------------------------");
+				}
+			}
+
+			//repeatCount
+			if (param == 5) {
+				readMainWithDSE(allNomenclatureTableFile);
+				readMainWithDSE(allFiles);
+
+				File resultFile = new File("C:\\xlsxResult.xlsx");
+				try {
+					writeIntoExcel(resultFile);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				System.out.println("\nГотово!");
+				System.out.println("Результат записан в файл по пути: " + resultFile.getAbsolutePath());
+			}
+		}
+
+
+		//all tasks done
 		if (gui != null) {
 			gui.progressBar.setValue(100);
 		}
@@ -201,95 +206,6 @@ public class CellsCounter {
 		if (advancedGUI != null) {
 			advancedGUI.progressBar.setValue(100);
 		}
-	}
-
-	public void writeIntoExcel(File file) throws IOException {
-		XSSFWorkbook book;
-		if (!Files.exists(file.toPath())) {
-			Files.createFile(file.toPath());
-			book = new XSSFWorkbook();
-		} else {
-			try (FileInputStream fis = new FileInputStream(file)) {
-				book = new XSSFWorkbook(fis);
-			}
-		}
-
-		String sheetName = directories.get(0).getName()
-				+ "-" + directories.get(directories.size() - 1).getName();
-		Sheet sheet;
-		if (book.getSheet(sheetName) != null) {
-			sheet = book.getSheet(sheetName);
-		} else {
-			sheet = book.createSheet(sheetName);
-		}
-
-
-		int excelFileNameColumnNum = 1;
-
-		sheet.setDefaultColumnWidth(50);
-
-		sheet.createRow(0);
-
-		boolean firstCycle = true;
-		for (ExcelFile excelFile : excelFiles) {
-
-			Cell excelFileNameCell = sheet.getRow(0).createCell(excelFileNameColumnNum);
-			excelFileNameCell.setCellValue(excelFile.getFileName());
-
-            int rowNum = 0;
-			for (Department department : departmentListFull) {
-				rowNum++;
-
-				Row departmentRow;
-				if (firstCycle) {
-				    departmentRow = sheet.createRow(rowNum);
-                    Cell departmentCell = departmentRow.createCell(0);
-                    departmentCell.setCellValue(department.getName());
-                }
-				rowNum++;
-
-				for (String nomenclature : department.getDseList()) {
-
-                    Row nomenclatureRow;
-				    if (firstCycle) {
-				        nomenclatureRow = sheet.createRow(rowNum);
-                        Cell nomenclatureCell = nomenclatureRow.createCell(0);
-                        nomenclatureCell.setCellValue(nomenclature);
-                    } else {
-				        nomenclatureRow = sheet.getRow(rowNum);
-                    }
-
-					rowNum++;
-
-					boolean depMatch = excelFile.getDepartmentList().stream()
-                            .anyMatch(d -> d.getName().equals(department.getName()));
-
-					if (depMatch) {
-                        Department fileDepartment = excelFile.getDepartmentList().stream()
-                                .filter(d -> d.getName().equals(department.getName()))
-                                .findAny()
-                                .get();
-
-                        boolean match = fileDepartment.getDseList().stream()
-                                .anyMatch(n -> n.equals(nomenclature));
-
-                        if (match) {
-                            nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(1);
-                        } else {
-                            nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(0);
-                        }
-                    }
-
-				}
-			}
-			excelFileNameColumnNum++;
-			firstCycle = false;
-		}
-
-
-
-		table = file;
-		recalculateAndWrite(book);
 	}
 
 	private void readMainWithDSE(File file) {
@@ -887,6 +803,100 @@ public class CellsCounter {
 
 	private void writeResultToParetoTable(File table) {
 		//TODO write realization
+	}
+
+	public void writeIntoExcel(File file) throws IOException {
+		XSSFWorkbook book;
+		if (!Files.exists(file.toPath())) {
+			Files.createFile(file.toPath());
+			book = new XSSFWorkbook();
+		} else {
+			try (FileInputStream fis = new FileInputStream(file)) {
+				book = new XSSFWorkbook(fis);
+			}
+		}
+
+		String sheetName = directories.get(0).getName()
+				+ "-" + directories.get(directories.size() - 1).getName();
+		Sheet sheet;
+		if (book.getSheet(sheetName) != null) {
+			sheet = book.getSheet(sheetName);
+		} else {
+			sheet = book.createSheet(sheetName);
+		}
+
+		int excelFileNameColumnNum = 1;
+
+		sheet.setDefaultColumnWidth(10);
+		sheet.setHorizontallyCenter(true);
+		sheet.createRow(0);
+
+		boolean firstCycle = true;
+		for (ExcelFile excelFile : excelFiles) {
+
+			Cell excelFileNameCell = sheet.getRow(0).createCell(excelFileNameColumnNum);
+
+			String date = excelFile.getFileName().substring
+					(excelFile.getFileName().lastIndexOf("("),
+							excelFile.getFileName().lastIndexOf(")"))
+					.replaceAll("\\(", "")
+					.replaceAll("\\)", "")
+					.trim();
+
+			excelFileNameCell.setCellValue(date);
+
+			int rowNum = 0;
+			for (Department department : departmentListFull) {
+				rowNum++;
+
+				Row departmentRow;
+				if (firstCycle) {
+					departmentRow = sheet.createRow(rowNum);
+					Cell departmentCell = departmentRow.createCell(0);
+					departmentCell.setCellValue(department.getName());
+				}
+				rowNum++;
+
+				for (String nomenclature : department.getDseList()) {
+
+					Row nomenclatureRow;
+					if (firstCycle) {
+						nomenclatureRow = sheet.createRow(rowNum);
+						Cell nomenclatureCell = nomenclatureRow.createCell(0);
+						nomenclatureCell.setCellValue(nomenclature);
+					} else {
+						nomenclatureRow = sheet.getRow(rowNum);
+					}
+
+					rowNum++;
+
+					boolean depMatch = excelFile.getDepartmentList().stream()
+							.anyMatch(d -> d.getName().equals(department.getName()));
+
+					if (depMatch) {
+						Department fileDepartment = excelFile.getDepartmentList().stream()
+								.filter(d -> d.getName().equals(department.getName()))
+								.findAny()
+								.get();
+
+						boolean match = fileDepartment.getDseList().stream()
+								.anyMatch(n -> n.equals(nomenclature));
+
+						if (match) {
+							nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(1);
+						} else {
+							nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(0);
+						}
+
+					}
+				}
+			}
+			excelFileNameColumnNum++;
+			firstCycle = false;
+		}
+
+		table = file;
+		recalculateAndWrite(book);
 	}
 
 	private void writeDateOfNow(XSSFSheet tableSheet) {

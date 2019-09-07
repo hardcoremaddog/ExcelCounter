@@ -23,7 +23,7 @@ public class AdvancedGUI extends JFrame {
 	private AdvancedGUI advancedGUI = this;
 
 	private List<File> directories = new ArrayList<>();
-    private List<File> filesForRepeat = new ArrayList<>();
+	private List<File> filesForRepeat = new ArrayList<>();
 	private List<File> filesForPareto = new ArrayList<>();
 
 	private File allNomenclatureTableFile;
@@ -35,7 +35,7 @@ public class AdvancedGUI extends JFrame {
 	private JButton tablesFileChooserButton = new JButton("Выбрать книги .xlsx с данными");
 	private JButton allNomenclatureTableFileChooseButton = new JButton("Выбрать книгу .xlsx с полным списком номенклатуры");
 
-    private JRadioButton repeatRadio = new JRadioButton("Анализ повторений");
+	private JRadioButton repeatRadio = new JRadioButton("Анализ повторений");
 	private JRadioButton paretoRadio = new JRadioButton("Парето");
 
 
@@ -72,7 +72,7 @@ public class AdvancedGUI extends JFrame {
 		container.add(tablesFilePathLabel);
 		container.add(allNomenclatureTableFileChooseButton);
 		container.add(allNomenclatureTableFilePathLabel);
-        container.add(repeatRadio);
+		container.add(repeatRadio);
 		container.add(paretoRadio);
 		container.add(startWork);
 
@@ -97,10 +97,10 @@ public class AdvancedGUI extends JFrame {
 					MyFileVisitor myFileVisitor = new MyFileVisitor();
 
 					if (repeatRadio.isSelected()) {
-                        myFileVisitor.setPartOfName("Производство");
-                    } else if (paretoRadio.isSelected()) {
-					    myFileVisitor.setPartOfName("Сводная");
-                    }
+						myFileVisitor.setPartOfName("Производство");
+					} else if (paretoRadio.isSelected()) {
+						myFileVisitor.setPartOfName("Сводная");
+					}
 
 					for (File file : directories) {
 						try {
@@ -133,18 +133,18 @@ public class AdvancedGUI extends JFrame {
 	public class MyFileVisitor extends SimpleFileVisitor<Path> {
 		private String partOfName;
 
-        public void setPartOfName(String partOfName) {
-            this.partOfName = partOfName;
-        }
+		public void setPartOfName(String partOfName) {
+			this.partOfName = partOfName;
+		}
 
-        @Override
+		@Override
 		public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 			if (partOfName != null && file.getFileName().toString().contains(partOfName)) {
-			    if (paretoRadio.isSelected()) {
-                    filesForPareto.add(file.toFile());
-                } else if (repeatRadio.isSelected()) {
-			        filesForRepeat.add(file.toFile());
-                }
+				if (paretoRadio.isSelected()) {
+					filesForPareto.add(file.toFile());
+				} else if (repeatRadio.isSelected()) {
+					filesForRepeat.add(file.toFile());
+				}
 			}
 			return FileVisitResult.CONTINUE;
 		}
@@ -174,22 +174,22 @@ public class AdvancedGUI extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-		    String errMsgAll = "Необходимо выбрать по крайней мере один файл книги с данными!";
+			String errMsgAll = "Необходимо выбрать по крайней мере один файл книги с данными!";
 			String errMsgAllNomenclature = "Необходимо выбрать файл книги c полным списком номенклатуры!";
 
 			CellsCounter cellsCounter;
 
 			if (paretoRadio.isSelected()) {
-                if (filesForPareto.size() == 0 || directories.size() == 0) {
-                    System.out.println(errMsgAll);
-                } else {
-                    cellsCounter = new CellsCounter(filesForPareto, directories, allNomenclatureTableFile, advancedGUI);
-                    cellsCounter.run(4, true, false);
-                }
-            } else if (repeatRadio.isSelected()) {
-                if (filesForRepeat.size() == 0 || directories.size() == 0) {
-                    System.out.println(errMsgAll);
-                } else {
+				if (filesForPareto.size() == 0 || directories.size() == 0) {
+					System.out.println(errMsgAll);
+				} else {
+					cellsCounter = new CellsCounter(filesForPareto, directories, allNomenclatureTableFile, advancedGUI);
+					cellsCounter.run(4, true, false);
+				}
+			} else if (repeatRadio.isSelected()) {
+				if (filesForRepeat.size() == 0 || directories.size() == 0) {
+					System.out.println(errMsgAll);
+				} else {
 					if (allNomenclatureTableFile == null) {
 						System.out.println(errMsgAllNomenclature);
 					} else {
@@ -197,7 +197,7 @@ public class AdvancedGUI extends JFrame {
 						cellsCounter.run(5, true, false);
 					}
 				}
-            }
+			}
 		}
 	}
 }

@@ -5,47 +5,47 @@ import java.util.List;
 
 public class Department {
 
-    private String name;
-    private String fileName;
+	private String name;
+	private String fileName;
 
-    private int redCellsCount;
-    private int yellowCellsCount;
+	private int redCellsCount;
+	private int yellowCellsCount;
 
-    private List<String> dseList = new ArrayList<>();
+	private List<String> dseList = new ArrayList<>();
 
-    public List<String> getDseList() {
-        return dseList;
-    }
+	public List<String> getDseList() {
+		return dseList;
+	}
 
-    public Department(String name) {
-        this.name = name;
-    }
+	public Department(String name) {
+		this.name = name;
+	}
 
-    public String getFileName() {
-        return fileName;
-    }
+	public String getFileName() {
+		return fileName;
+	}
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public int getRedCellsCount() {
-        return redCellsCount;
-    }
+	public int getRedCellsCount() {
+		return redCellsCount;
+	}
 
-    public void setRedCellsCount(int redCellsCount) {
-        this.redCellsCount = redCellsCount;
-    }
+	public void setRedCellsCount(int redCellsCount) {
+		this.redCellsCount = redCellsCount;
+	}
 
-    public int getYellowCellsCount() {
-        return yellowCellsCount;
-    }
+	public int getYellowCellsCount() {
+		return yellowCellsCount;
+	}
 
-    public void setYellowCellsCount(int yellowCellsCount) {
-        this.yellowCellsCount = yellowCellsCount;
-    }
+	public void setYellowCellsCount(int yellowCellsCount) {
+		this.yellowCellsCount = yellowCellsCount;
+	}
 }
