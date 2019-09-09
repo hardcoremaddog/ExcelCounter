@@ -23,8 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CellsCounter {
-    GUI gui;
-    AdvancedGUI advancedGUI;
+    private GUI gui;
+    private AdvancedGUI advancedGUI;
 
     private boolean win95colors;
 
@@ -190,9 +190,8 @@ public class CellsCounter {
 
                 String username = System.getProperty("user.name");
 
-
                 File directory = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\Результаты подсчета повторений\\" + username);
-                File resultFile = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\Результаты подсчета повторений\\" + username + "\\RepeatCountResult.xlsx");
+                File resultFile = new File(directory.toPath() + "\\RepeatCountResult.xlsx");
                 try {
                     writeIntoExcel(directory, resultFile);
                 } catch (IOException e) {
@@ -285,7 +284,6 @@ public class CellsCounter {
 
             DataFormatter formatter = new DataFormatter();
 
-            String vendorValue = formatter.formatCellValue(dseVendorCell); //may be needed in future
             String nomenclatureValue = formatter.formatCellValue(dseNomenclatureCell);
 
             if (manyFiles) {
@@ -811,11 +809,7 @@ public class CellsCounter {
         }
     }
 
-    private void writeResultToParetoTable(File table) {
-        //TODO write realization
-    }
-
-    public void writeIntoExcel(File directory, File file) throws IOException {
+    private void writeIntoExcel(File directory, File file) throws IOException {
         XSSFWorkbook book;
         if (!Files.exists(file.toPath())) {
             Files.createDirectories(directory.toPath());
@@ -845,7 +839,6 @@ public class CellsCounter {
         boolean firstCycle = true;
 
         for (ExcelFile excelFile : excelFiles) {
-
             Cell excelFileNameCell = sheet.getRow(0).createCell(excelFileNameColumnNum);
 
             String filename = excelFile.getFileName();
@@ -858,14 +851,11 @@ public class CellsCounter {
             } else {
                 date = "Не удалось прочитать дату из названия файла";
             }
-
             excelFileNameCell.setCellValue(date);
 
             int rowNum = 0;
-
             for (Department department : departmentListFull) {
                 rowNum++;
-
                 Row departmentRow;
                 if (firstCycle) {
                     if (department.getDseTreeSet().size() != 0) {
@@ -875,7 +865,6 @@ public class CellsCounter {
                     }
                 }
                 rowNum++;
-
                 for (String nomenclature : department.getDseTreeSet()) {
                     Row nomenclatureRow;
                     if (firstCycle) {
@@ -885,9 +874,7 @@ public class CellsCounter {
                     } else {
                         nomenclatureRow = sheet.getRow(rowNum);
                     }
-
                     rowNum++;
-
                     boolean depMatch = excelFile.getDepartmentList().stream()
                             .anyMatch(d -> d.getName().equals(department.getName()));
 
