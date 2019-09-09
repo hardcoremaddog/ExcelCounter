@@ -1,51 +1,51 @@
 package com.excelcounter.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Department {
 
-	private String name;
-	private String fileName;
+    private String name;
+    private String fileName;
 
-	private int redCellsCount;
-	private int yellowCellsCount;
+    private int redCellsCount;
+    private int yellowCellsCount;
 
-	private List<String> dseList = new ArrayList<>();
+    private Set<String> dseTreeSet = new TreeSet<>();
 
-	public List<String> getDseList() {
-		return dseList;
-	}
+    public Set<String> getDseTreeSet() {
+        return dseTreeSet;
+    }
 
-	public Department(String name) {
-		this.name = name;
-	}
+    public Department(String name) {
+        this.name = name;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public int getRedCellsCount() {
-		return redCellsCount;
-	}
+    public int getRedCellsCount() {
+        return redCellsCount;
+    }
 
-	public void setRedCellsCount(int redCellsCount) {
-		this.redCellsCount = redCellsCount;
-	}
+    public void setRedCellsCount(int redCellsCount) {
+        this.redCellsCount = redCellsCount;
+    }
 
-	public int getYellowCellsCount() {
-		return yellowCellsCount;
-	}
+    public int getYellowCellsCount() {
+        return yellowCellsCount;
+    }
 
-	public void setYellowCellsCount(int yellowCellsCount) {
-		this.yellowCellsCount = yellowCellsCount;
-	}
+    public void setYellowCellsCount(int yellowCellsCount) {
+        this.yellowCellsCount = yellowCellsCount;
+    }
 }

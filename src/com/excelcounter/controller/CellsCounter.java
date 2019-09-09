@@ -19,6 +19,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CellsCounter {
     GUI gui;
@@ -186,9 +188,13 @@ public class CellsCounter {
                 readMainWithDSE(allNomenclatureTableFile);
                 readMainWithDSE(allFiles);
 
-                File resultFile = new File("C:\\xlsxResult.xlsx");
+                String username = System.getProperty("user.name");
+
+
+                File directory = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\Результаты подсчета повторений\\" + username);
+                File resultFile = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\Результаты подсчета повторений\\" + username + "\\RepeatCountResult.xlsx");
                 try {
-                    writeIntoExcel(resultFile);
+                    writeIntoExcel(directory, resultFile);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -252,7 +258,6 @@ public class CellsCounter {
                         if (font.getBold() && font.getFontHeightInPoints() == 8 && cell.getCellType() == CellType.STRING) {
                             String departmentName = cell.getStringCellValue();
                             excelFile.getDepartmentList().add(new Department(departmentName));
-
                             readDSE(i + 1, sheet, departmentName, excelFile, true);
                         }
                     }
@@ -280,19 +285,25 @@ public class CellsCounter {
 
             DataFormatter formatter = new DataFormatter();
 
-            String vendorValue = formatter.formatCellValue(dseVendorCell); //todo delete if no need
+            String vendorValue = formatter.formatCellValue(dseVendorCell); //may be needed in future
             String nomenclatureValue = formatter.formatCellValue(dseNomenclatureCell);
 
             if (manyFiles) {
                 for (Department department : excelFile.getDepartmentList()) {
                     if (department.getName().equals(departmentName)) {
-                        department.getDseList().add(nomenclatureValue);
+
+                        String redARGBHEX = "FFFFC0CB";
+
+                        //if this dse red
+                        if (cs.getFillForegroundColorColor().getARGBHex().equals(redARGBHEX)) {
+                            department.getDseTreeSet().add(nomenclatureValue);
+                        }
                     }
                 }
             } else {
                 for (Department department : departmentListFull) {
                     if (department.getName().equals(departmentName)) {
-                        department.getDseList().add(nomenclatureValue);
+                        department.getDseTreeSet().add(nomenclatureValue);
                     }
                 }
             }
@@ -804,9 +815,10 @@ public class CellsCounter {
         //TODO write realization
     }
 
-    public void writeIntoExcel(File file) throws IOException {
+    public void writeIntoExcel(File directory, File file) throws IOException {
         XSSFWorkbook book;
         if (!Files.exists(file.toPath())) {
+            Files.createDirectories(directory.toPath());
             Files.createFile(file.toPath());
             book = new XSSFWorkbook();
         } else {
@@ -836,31 +848,35 @@ public class CellsCounter {
 
             Cell excelFileNameCell = sheet.getRow(0).createCell(excelFileNameColumnNum);
 
-            String date = excelFile.getFileName().substring
-                    (excelFile.getFileName().lastIndexOf("("),
-                            excelFile.getFileName().lastIndexOf(")"))
-                    .replaceAll("\\(", "")
-                    .replaceAll("\\)", "")
-                    .trim();
+            String filename = excelFile.getFileName();
+            Pattern pattern = Pattern.compile("^.+(\\d{2}[.]\\d{2}[.]\\d{2}).+$");
+            Matcher matcher = pattern.matcher(filename);
+
+            String date;
+            if (matcher.find()) {
+                date = matcher.group(1);
+            } else {
+                date = "Не удалось прочитать дату из названия файла";
+            }
 
             excelFileNameCell.setCellValue(date);
 
             int rowNum = 0;
 
             for (Department department : departmentListFull) {
-
                 rowNum++;
 
                 Row departmentRow;
                 if (firstCycle) {
-                    departmentRow = sheet.createRow(rowNum);
-                    Cell departmentCell = departmentRow.createCell(0);
-                    departmentCell.setCellValue(department.getName());
+                    if (department.getDseTreeSet().size() != 0) {
+                        departmentRow = sheet.createRow(rowNum);
+                        Cell departmentCell = departmentRow.createCell(0);
+                        departmentCell.setCellValue(department.getName());
+                    }
                 }
                 rowNum++;
 
-                for (String nomenclature : department.getDseList()) {
-
+                for (String nomenclature : department.getDseTreeSet()) {
                     Row nomenclatureRow;
                     if (firstCycle) {
                         nomenclatureRow = sheet.createRow(rowNum);
@@ -882,7 +898,7 @@ public class CellsCounter {
                                 .orElse(null);
 
                         if (fileDepartment != null) {
-                            boolean match = fileDepartment.getDseList().stream()
+                            boolean match = fileDepartment.getDseTreeSet().stream()
                                     .anyMatch(n -> n.equals(nomenclature));
 
                             if (match) {
