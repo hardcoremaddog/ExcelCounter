@@ -832,8 +832,7 @@ public class CellsCounter {
 
         int excelFileNameColumnNum = 1;
 
-        sheet.setDefaultColumnWidth(10);
-        sheet.setHorizontallyCenter(true);
+        sheet.setDefaultColumnWidth(7);
         sheet.createRow(0);
 
         boolean firstCycle = true;
@@ -888,10 +887,11 @@ public class CellsCounter {
                             boolean match = fileDepartment.getDseTreeSet().stream()
                                     .anyMatch(n -> n.equals(nomenclature));
 
+                            Cell valueCell = nomenclatureRow.createCell(excelFileNameColumnNum);
                             if (match) {
-                                nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(1);
+                                valueCell.setCellValue(1);
                             } else {
-                                nomenclatureRow.createCell(excelFileNameColumnNum).setCellValue(0);
+                                valueCell.setCellValue(0);
                             }
                         }
                     }
@@ -900,6 +900,9 @@ public class CellsCounter {
             excelFileNameColumnNum++;
             firstCycle = false;
         }
+        sheet.setRowSumsBelow(false);
+        sheet.createFreezePane(0, 1);
+        sheet.setColumnWidth(0, 17500);
 
         table = file;
         recalculateAndWrite(book);

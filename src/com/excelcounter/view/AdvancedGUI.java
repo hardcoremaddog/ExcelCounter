@@ -36,7 +36,7 @@ public class AdvancedGUI extends JFrame {
 	private JButton allNomenclatureTableFileChooseButton = new JButton("Выбрать книгу .xlsx с полным списком номенклатуры");
 
 	private JRadioButton repeatRadio = new JRadioButton("Анализ повторений");
-	private JRadioButton paretoRadio = new JRadioButton("Парето");
+	private JRadioButton paretoRadio = new JRadioButton("Парето (еще не реализовано)");
 
 
 	private JLabel tablesFilePathLabel = new JLabel();
