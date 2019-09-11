@@ -45,7 +45,7 @@ public class AdvancedGUI extends JFrame {
 	private JButton startWork = new JButton("Посчитать и записать");
 
 	AdvancedGUI() {
-		super("ExcelCounter" + Main.VERSION);
+		super("ExcelCounter v" + Main.VERSION);
 		this.setBounds(100, 100, 900, 350);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

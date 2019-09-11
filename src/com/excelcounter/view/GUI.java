@@ -25,18 +25,13 @@ public class GUI extends JFrame {
 	private JButton advancedGUIShowButton = new JButton("Перейти на дополнительный интерфейс");
 
 	private JLabel allFilePathLabel = new JLabel();
-	private JLabel sbytFilePathLaber = new JLabel();
+	private JLabel sbytFilePathLabel = new JLabel();
 	private JLabel tableFilePathLabel = new JLabel();
 
 	private JLabel tableTypeLabel = new JLabel("Тип таблицы для записи данных");
 	private JRadioButton table765Radio = new JRadioButton("765");
 	private JRadioButton table753Radio = new JRadioButton("753");
 	private JRadioButton tableOrdersRadio = new JRadioButton("Заказы");
-
-
-	public JCheckBox getCheck() {
-		return check;
-	}
 
 	private JCheckBox check = new JCheckBox("Вывести результат подсчета в консоль", true);
 	private JCheckBox win95colors = new JCheckBox("Win95 cell colors", false);
@@ -46,7 +41,7 @@ public class GUI extends JFrame {
 	public JProgressBar progressBar = new JProgressBar();
 
 	GUI() {
-		super("ExcelCounter " + Main.VERSION);
+		super("ExcelCounter v" + Main.VERSION);
 		this.setBounds(100, 100, 900, 350);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -57,7 +52,7 @@ public class GUI extends JFrame {
 		container.add(sbytFileChooseButton);
 		container.add(tableFileChooseButton);
 		container.add(allFilePathLabel);
-		container.add(sbytFilePathLaber);
+		container.add(sbytFilePathLabel);
 		container.add(tableFilePathLabel);
 
 		ButtonGroup group = new ButtonGroup();
@@ -127,7 +122,7 @@ public class GUI extends JFrame {
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				checkFile(sbytFileChooser);
 				sbyt = sbytFileChooser.getSelectedFile();
-				sbytFilePathLaber.setText(sbyt.getName());
+				sbytFilePathLabel.setText(sbyt.getName());
 			}
 		}
 	}
