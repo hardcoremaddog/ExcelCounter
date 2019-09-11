@@ -203,7 +203,6 @@ public class CellsCounter {
             }
         }
 
-
         //all tasks done
         if (gui != null) {
             gui.progressBar.setValue(100);

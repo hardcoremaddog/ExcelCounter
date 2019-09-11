@@ -36,7 +36,7 @@ public class AdvancedGUI extends JFrame {
 	private JButton allNomenclatureTableFileChooseButton = new JButton("Выбрать книгу .xlsx с полным списком номенклатуры");
 
 	private JRadioButton repeatRadio = new JRadioButton("Анализ повторений");
-	private JRadioButton paretoRadio = new JRadioButton("Парето (еще не реализовано)");
+	private JRadioButton paretoRadio = new JRadioButton("Парето (без записи)");
 
 
 	private JLabel tablesFilePathLabel = new JLabel();
@@ -82,8 +82,12 @@ public class AdvancedGUI extends JFrame {
 	class allFileChooseButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			//clear
 			progressBar.setValue(0);
 			filesForPareto.clear();
+			filesForRepeat.clear();
+			tablesFilePathLabel.setText("");
+
 			JFileChooser allFileChooser = new JFileChooser();
 			allFileChooser.setMultiSelectionEnabled(true);
 			allFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -92,7 +96,7 @@ public class AdvancedGUI extends JFrame {
 			if (ret == JFileChooser.APPROVE_OPTION) {
 				directories = Arrays.asList(allFileChooser.getSelectedFiles());
 				if (directories.size() > 0) {
-					tablesFilePathLabel.setText("Файлы выбраны.");
+					tablesFilePathLabel.setText("Файлы выбраны");
 
 					MyFileVisitor myFileVisitor = new MyFileVisitor();
 
@@ -133,7 +137,7 @@ public class AdvancedGUI extends JFrame {
 	public class MyFileVisitor extends SimpleFileVisitor<Path> {
 		private String partOfName;
 
-		public void setPartOfName(String partOfName) {
+		private void setPartOfName(String partOfName) {
 			this.partOfName = partOfName;
 		}
 
