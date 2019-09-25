@@ -4,37 +4,37 @@ import java.util.ArrayList;
 
 public class Order {
 
-	private String name;
-	private ArrayList<Department> departments = new ArrayList<>();
+    private String name;
+    private ArrayList<Department> departments = new ArrayList<>();
 
-	public Order(String name) {
-		this.name = name;
-	}
+    public Order(String name) {
+        this.name = name;
+    }
 
-	private int redCells;
-	private int yellowCells;
+    private int redCells;
+    private int yellowCells;
 
-	public ArrayList<Department> getDepartments() {
-		return departments;
-	}
+    public ArrayList<Department> getDepartments() {
+        return departments;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public int getRedCells() {
-		return redCells;
-	}
+    public int getRedCells() {
+        return redCells;
+    }
 
-	public void setRedCells(int redCells) {
-		this.redCells = redCells;
-	}
+    public void setRedCells(int redCells) {
+        this.redCells = redCells;
+    }
 
-	public int getYellowCells() {
-		return yellowCells;
-	}
+    public int getYellowCells() {
+        return yellowCells;
+    }
 
-	public void setYellowCells(int yellowCells) {
-		this.yellowCells = yellowCells;
-	}
+    public void setYellowCells(int yellowCells) {
+        this.yellowCells = yellowCells;
+    }
 }

@@ -837,6 +837,7 @@ public class CellsCounter {
 
         boolean firstCycle = true;
 
+
         for (ExcelFile excelFile : excelFiles) {
             Cell excelFileNameCell = sheet.getRow(0).createCell(excelFileNameColumnNum);
 
@@ -861,14 +862,6 @@ public class CellsCounter {
                         departmentRow = sheet.createRow(rowNum);
                         Cell departmentCell = departmentRow.createCell(0);
                         departmentCell.setCellValue(department.getName());
-
-                        XSSFFont font = book.createFont();
-                        font.setBold(true);
-                        font.setFontHeight(18);
-
-                        XSSFCellStyle cellStyle = book.createCellStyle();
-                        cellStyle.setFont(font);
-                        departmentCell.setCellStyle(cellStyle);
                     }
                 }
                 rowNum++;
@@ -901,10 +894,6 @@ public class CellsCounter {
                             } else {
                                 valueCell.setCellValue(0);
                             }
-                            XSSFCellStyle cellStyle = book.createCellStyle();
-                            cellStyle.setAlignment(HorizontalAlignment.CENTER);
-                            cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-                            valueCell.setCellStyle(cellStyle);
                         }
                     }
                 }

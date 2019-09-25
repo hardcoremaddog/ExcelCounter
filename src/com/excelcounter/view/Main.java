@@ -6,39 +6,39 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
-	//	private static File all;
-	//	private static File table;
-	public static final String VERSION = "0.7a";
+    //	private static File all;
+    //	private static File table;
+    public static final String VERSION = "v0.7a";
 
-	public static void main(String[] args) throws IOException {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
-			e.printStackTrace();
-		}
+    public static void main(String[] args) throws IOException {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+        }
 
-		GUI app = new GUI();
-		app.setVisible(true);
+        GUI app = new GUI();
+        app.setVisible(true);
 
-		System.out.println("ExcelCounter " + VERSION +
-				"\nby Alexey Zheludov" +
-				"\nCopyright (c) 2019 MDDG Software, All rights reserved.\n" +
+        System.out.println("ExcelCounter " + VERSION +
+                "\nby Alexey Zheludov" +
+                "\nCopyright (c) 2019 MDDG Software, All rights reserved.\n" +
 
-				"\nПриложение разработано исключительно для подсчета" +
-				"\nкрасных и желтых строк, подсчета количества" +
-				"\nповторений позиций в формах отчета" +
-				"\n\"Укомплектованность оперативных планов\" и" +
-				"\nподсчета количества непереданных позиций на сбыт," +
-				"\nв формах отчета \"Контроль передачи на сбыт\"" +
-				"\nа также записи результата в книги Excel." +
-				"\nПриложение работает ТОЛЬКО с книгами формата .xlsx и .xlsm." +
-				"\nИспользование приложения в других целях не гарантирует" +
-				"\nего корректную работу, а автор не несет ответственности" +
-				"\nза испорченные, в ходе работы приложения, файлы!" +
-				"\n\nВ виду элементарности функционала и наличия" +
-				"\nпростого пользовательского интерфейса - " +
-				"\nдокументация и инструкции по работе с приложением" +
-				"\nне предусмотрены.");
+                "\nПриложение разработано исключительно для подсчета" +
+                "\nкрасных и желтых строк, подсчета количества" +
+                "\nповторений позиций в формах отчета" +
+                "\n\"Укомплектованность оперативных планов\" и" +
+                "\nподсчета количества непереданных позиций на сбыт," +
+                "\nв формах отчета \"Контроль передачи на сбыт\"" +
+                "\nа также записи результата в книги Excel." +
+                "\nПриложение работает ТОЛЬКО с книгами формата .xlsx и .xlsm." +
+                "\nИспользование приложения в других целях не гарантирует" +
+                "\nего корректную работу, а автор не несет ответственности" +
+                "\nза испорченные, в ходе работы приложения, файлы!" +
+                "\n\nВ виду элементарности функционала и наличия" +
+                "\nпростого пользовательского интерфейса - " +
+                "\nдокументация и инструкции по работе с приложением" +
+                "\nне предусмотрены.");
 
 //				"\nРаботать в приложении можно как с помощью консоли, так и в пользовательском интерфейсе. \n\n")
 
@@ -118,14 +118,14 @@ public class Main {
 //				}
 //			}
 //		}
-	}
+    }
 
-	protected static void checkFile(File file) throws IOException {
-		if (!file.exists() && !file.isFile()) {
-			throw new FileNotFoundException("Неверно указан путь до книги excel с данными. Книги по этому пути не существует!");
-		}
-		if (!file.getName().endsWith(".xlsx") && !file.getName().endsWith(".xlsm")) {
-			throw new UnsupportedOperationException("Файл не является книгой excel формата .xlsx или .xlsm");
-		}
-	}
+    protected static void checkFile(File file) throws IOException {
+        if (!file.exists() && !file.isFile()) {
+            throw new FileNotFoundException("Неверно указан путь до книги excel с данными. Книги по этому пути не существует!");
+        }
+        if (!file.getName().endsWith(".xlsx") && !file.getName().endsWith(".xlsm")) {
+            throw new UnsupportedOperationException("Файл не является книгой excel формата .xlsx или .xlsm");
+        }
+    }
 }
