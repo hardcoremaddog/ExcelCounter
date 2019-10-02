@@ -56,6 +56,13 @@ public class CellsCounter {
     private final String OMO = "Отдел материального обеспечения";
     private final String MMZ02 = "02ММЗ ММЗ Цех 02";
 
+    private final String ELMASH = "Электромашинный участок";
+    private final String TSEH_SB_VAG = "Цех сборки вагонов";
+    private final String UCH_SB_TEL = "Участок сборки тележек";
+    private final String KOMPL_TSEH = "Комплектовочный цех";
+    private final String UCH_OKR_VAG = "Участок окраски вагонов";
+    private final String UCH_MEH_OBR = "Участок механической обработки и ремонта комплектующих";
+
     private List<Department> departmentListFull = new ArrayList<>();
 
     private void initDepartmentsList() {
@@ -601,6 +608,36 @@ public class CellsCounter {
                                     row.getCell(18).setCellValue(department.getRedCellsCount());
                                     break;
                                 }
+                                //TODO add radio button SPB and realise method for it
+                                case ELMASH: {
+                                    row.getCell(20).setCellValue(department.getRedCellsCount());
+                                    break;
+                                }
+
+                                case TSEH_SB_VAG: {
+                                    row.getCell(21).setCellValue(department.getRedCellsCount());
+                                    break;
+                                }
+
+                                case UCH_SB_TEL: {
+                                    row.getCell(22).setCellValue(department.getRedCellsCount());
+                                    break;
+                                }
+
+                                case KOMPL_TSEH: {
+                                    row.getCell(23).setCellValue(department.getRedCellsCount());
+                                    break;
+                                }
+
+                                case UCH_MEH_OBR: {
+                                    row.getCell(24).setCellValue(department.getRedCellsCount());
+                                    break;
+                                }
+
+                                case UCH_OKR_VAG: {
+                                    row.getCell(25).setCellValue(department.getRedCellsCount());
+                                    break;
+                                }
                             }
                         }
                     }
@@ -837,7 +874,6 @@ public class CellsCounter {
 
         boolean firstCycle = true;
 
-
         for (ExcelFile excelFile : excelFiles) {
             Cell excelFileNameCell = sheet.getRow(0).createCell(excelFileNameColumnNum);
 
@@ -889,6 +925,7 @@ public class CellsCounter {
                                     .anyMatch(n -> n.equals(nomenclature));
 
                             Cell valueCell = nomenclatureRow.createCell(excelFileNameColumnNum);
+
                             if (match) {
                                 valueCell.setCellValue(1);
                             } else {

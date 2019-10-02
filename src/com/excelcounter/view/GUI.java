@@ -29,7 +29,7 @@ public class GUI extends JFrame {
     private JLabel tableFilePathLabel = new JLabel();
 
     private JLabel tableTypeLabel = new JLabel("Тип таблицы для записи данных");
-    private JRadioButton table765Radio = new JRadioButton("765");
+    private JRadioButton table765Radio = new JRadioButton("765 и СПб");
     private JRadioButton table753Radio = new JRadioButton("753");
     private JRadioButton tableOrdersRadio = new JRadioButton("Заказы");
 
