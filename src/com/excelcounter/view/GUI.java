@@ -169,7 +169,7 @@ public class GUI extends JFrame {
             } else {
                 param = 1;
             }
-            cellsCounter.run(param, gui.check.isSelected(), gui.win95colors.isSelected());
+            cellsCounter.finalWorkWithData(param, gui.check.isSelected(), gui.win95colors.isSelected());
         }
     }
 

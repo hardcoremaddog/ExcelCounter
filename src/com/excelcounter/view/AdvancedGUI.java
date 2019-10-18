@@ -25,6 +25,7 @@ public class AdvancedGUI extends JFrame {
     private List<File> directories = new ArrayList<>();
     private List<File> filesForRepeat = new ArrayList<>();
     private List<File> filesForPareto = new ArrayList<>();
+    private List<File> filesForReleaseCount = new ArrayList<>();
 
     private File allNomenclatureTableFile;
 
@@ -33,11 +34,11 @@ public class AdvancedGUI extends JFrame {
     private JButton mainGUIShowButton = new JButton("Вернуться на основной интерфейс");
 
     private JButton tablesFileChooserButton = new JButton("Выбрать книги .xlsx с данными");
-    private JButton allNomenclatureTableFileChooseButton = new JButton("Выбрать книгу .xlsx с полным списком номенклатуры");
+    private JButton allNomenclatureTableFileChooseButton = new JButton("Полный список номенклатуры/опер. планов");
 
     private JRadioButton repeatRadio = new JRadioButton("Анализ повторений");
     private JRadioButton paretoRadio = new JRadioButton("Парето (без записи)");
-
+    private JRadioButton releaseRadio = new JRadioButton("Анализ выпуска");
 
     private JLabel tablesFilePathLabel = new JLabel();
     private JLabel allNomenclatureTableFilePathLabel = new JLabel();
@@ -50,7 +51,7 @@ public class AdvancedGUI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container container = this.getContentPane();
-        container.setLayout(new GridLayout(5, 2, 1, 1));
+        container.setLayout(new GridLayout(5, 3, 1, 1));
 
         mainGUIShowButton.addActionListener(new MainGUIShowButton());
         tablesFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
@@ -60,23 +61,34 @@ public class AdvancedGUI extends JFrame {
         repeatRadio.setSelected(true);
 
         ButtonGroup group = new ButtonGroup();
-        group.add(paretoRadio);
         group.add(repeatRadio);
+        group.add(releaseRadio);
+        group.add(paretoRadio);
+
 
         progressBar.setStringPainted(true);
         progressBar.setMinimum(0);
         progressBar.setMaximum(100);
-        container.add(mainGUIShowButton);
+
         container.add(new JLabel());
         container.add(tablesFileChooserButton);
-        container.add(tablesFilePathLabel);
         container.add(allNomenclatureTableFileChooseButton);
-        container.add(allNomenclatureTableFilePathLabel);
-        container.add(repeatRadio);
-        container.add(paretoRadio);
-        container.add(startWork);
 
+        container.add(new JLabel());
+        container.add(tablesFilePathLabel);
+        container.add(allNomenclatureTableFilePathLabel);
+
+        container.add(new JLabel());
+        container.add(new JLabel());
+        container.add(new JLabel());
+
+        container.add(repeatRadio);
+        container.add(releaseRadio);
+        container.add(paretoRadio);
+
+        container.add(mainGUIShowButton);
         container.add(progressBar);
+        container.add(startWork);
     }
 
     class allFileChooseButtonActionListener implements ActionListener {
@@ -104,6 +116,8 @@ public class AdvancedGUI extends JFrame {
                         myFileVisitor.setPartOfName("Производство");
                     } else if (paretoRadio.isSelected()) {
                         myFileVisitor.setPartOfName("Сводная");
+                    } else if (releaseRadio.isSelected()) {
+                        myFileVisitor.setPartOfName("partForRelease");
                     }
 
                     for (File file : directories) {
@@ -126,7 +140,7 @@ public class AdvancedGUI extends JFrame {
             progressBar.setValue(0);
             JFileChooser tableFileChooser = new JFileChooser();
             setXLSXFilter(tableFileChooser);
-            int ret = tableFileChooser.showDialog(null, "Выбрать файл книги с полным списком номенклатуры");
+            int ret = tableFileChooser.showDialog(null, "Выбрать файл книги с полным списком номенклатуры/опер. планов");
             if (ret == JFileChooser.APPROVE_OPTION) {
                 allNomenclatureTableFile = tableFileChooser.getSelectedFile();
                 allNomenclatureTableFilePathLabel.setText(allNomenclatureTableFile.getName());
@@ -150,6 +164,11 @@ public class AdvancedGUI extends JFrame {
                     filesForRepeat.add(file.toFile());
                 }
             }
+
+            if (partOfName != null && partOfName.equalsIgnoreCase("partForRelease")) {
+                filesForReleaseCount.add(file.toFile());
+            }
+
             return FileVisitResult.CONTINUE;
         }
     }
@@ -188,7 +207,7 @@ public class AdvancedGUI extends JFrame {
                     System.out.println(errMsgAll);
                 } else {
                     cellsCounter = new CellsCounter(filesForPareto, directories, allNomenclatureTableFile, advancedGUI);
-                    cellsCounter.run(4, true, false);
+                    cellsCounter.finalWorkWithData(4, true, false);
                 }
             } else if (repeatRadio.isSelected()) {
                 if (filesForRepeat.size() == 0 || directories.size() == 0) {
@@ -198,8 +217,15 @@ public class AdvancedGUI extends JFrame {
                         System.out.println(errMsgAllNomenclature);
                     } else {
                         cellsCounter = new CellsCounter(filesForRepeat, directories, allNomenclatureTableFile, advancedGUI);
-                        cellsCounter.run(5, true, false);
+                        cellsCounter.finalWorkWithData(5, true, false);
                     }
+                }
+            } else if (releaseRadio.isSelected()) {
+                if (filesForReleaseCount.size() == 0) {
+                    System.out.println(errMsgAll);
+                } else {
+                    cellsCounter = new CellsCounter(filesForReleaseCount, null, allNomenclatureTableFile, advancedGUI);
+                    cellsCounter.finalWorkWithData(6, true, false);
                 }
             }
         }

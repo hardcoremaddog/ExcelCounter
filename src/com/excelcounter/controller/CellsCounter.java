@@ -16,9 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +34,8 @@ public class CellsCounter {
     private File all;
     private File allNomenclatureTableFile;
     private File table;
+    private File ostatki;
+    private File primenyaemost;
     private File sbyt = null;
     private List<Order> orders = new ArrayList<>();
     private List<OrderSbyt> ordersSbyt = new ArrayList<>();
@@ -64,6 +64,8 @@ public class CellsCounter {
     private final String UCH_MEH_OBR = "Участок механической обработки и ремонта комплектующих";
 
     private List<Department> departmentListFull = new ArrayList<>();
+    private Map<String, Department> departmentMap = new HashMap<>();
+    private Set<String> warningOrders = new TreeSet<>();
 
     private void initDepartmentsList() {
         departmentListFull.add(new Department(TSEH_5));
@@ -81,6 +83,12 @@ public class CellsCounter {
         departmentListFull.add(new Department(OMZK_new));
         departmentListFull.add(new Department(OMO));
         departmentListFull.add(new Department(MMZ02));
+        departmentListFull.add(new Department(ELMASH));
+        departmentListFull.add(new Department(TSEH_SB_VAG));
+        departmentListFull.add(new Department(UCH_SB_TEL));
+        departmentListFull.add(new Department(KOMPL_TSEH));
+        departmentListFull.add(new Department(UCH_OKR_VAG));
+        departmentListFull.add(new Department(UCH_MEH_OBR));
     }
 
     public CellsCounter(File all, GUI gui) {
@@ -109,13 +117,12 @@ public class CellsCounter {
         this.advancedGUI = advancedGUI;
     }
 
-    public void run(int param, boolean showResult, boolean win95colors) {
+    public void finalWorkWithData(int param, boolean showResult, boolean win95colors) {
         this.win95colors = win95colors;
 
         //all table red and yellow cells count
         if (all != null) {
             readMain(all);
-
             if (showResult) {
                 if (all != null) {
                     for (Order order : orders) {
@@ -176,9 +183,7 @@ public class CellsCounter {
             //paretoTable
             if (param == 4) {
                 readTables(allFiles);
-
                 directories.sort(Comparator.comparing(File::getName));
-
                 for (Day day : days) {
                     System.out.println("\n");
                     System.out.println("=====================");
@@ -198,15 +203,49 @@ public class CellsCounter {
 
                 String username = System.getProperty("user.name");
 
+                String filePrefix = "";
+                if (allNomenclatureTableFile.getName().contains("765")) {
+                    filePrefix = "765";
+                } else if (allNomenclatureTableFile.getName().contains("753")) {
+                    filePrefix = "753";
+                }
+
                 File directory = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\Результаты подсчета повторений\\" + username);
-                File resultFile = new File(directory.toPath() + "\\RepeatCountResult.xlsx");
+                File resultFile = new File(directory.toPath() + "\\" + filePrefix + "RepeatCountResult.xlsx");
                 try {
-                    writeIntoExcel(directory, resultFile);
+                    writeResultIntoRepeatCountTable(directory, resultFile);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 System.out.println("\nГотово!");
                 System.out.println("Результат записан в файл по пути: " + resultFile.getAbsolutePath());
+            }
+
+            if (param == 6) {
+                readMainForReleaseAnalysis();
+
+                for (String departmentName : departmentMap.keySet()) {
+                    Department department = departmentMap.get(departmentName);
+
+                    System.out.println("\n==================================================================");
+                    System.out.println("\n" + department.getName());
+                    readOstatki(ostatki, department);
+
+                    for (OperationLvl operationLvl : department.getOperationsLvlList()) {
+                        System.out.println(operationLvl.getName());
+                        for (Order order : operationLvl.getOrdersList()) {
+                            if (order.getPrimenyaemostCount() != order.getFaktReleaseCount()) {
+                                System.out.println(order.getName() + "     " + order.getZakazPokypatelya() + " Применяемость: " + order.getPrimenyaemostCount() + " Факт: " + order.getFaktReleaseCount());
+                                warningOrders.add(order.getZakazPokypatelya());
+                            }
+                        }
+                    }
+                }
+                System.out.println("\n==================================================================");
+                System.out.println("\nСписок заказов, по которым возникли проблемы:");
+                for (String order : warningOrders) {
+                    System.out.println(order);
+                }
             }
         }
 
@@ -217,6 +256,183 @@ public class CellsCounter {
 
         if (advancedGUI != null) {
             advancedGUI.progressBar.setValue(100);
+        }
+    }
+
+    private void readMainForReleaseAnalysis() {
+        //init files
+        for (File file : allFiles) {
+            if (file.getName().contains("Остатки")) {
+                ostatki = file;
+            } else if (file.getName().contains("Применяемость")) {
+                primenyaemost = file;
+            }
+        }
+        readPrimenyaemost(primenyaemost);
+    }
+
+    private void readPrimenyaemost(File file) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file))) {
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+                Row row = sheet.getRow(i);
+
+                Cell departmentCell = row.getCell(0);
+                Cell operationLvlCell = row.getCell(3);
+
+                XSSFCellStyle cs = (XSSFCellStyle) departmentCell.getCellStyle();
+                XSSFFont font = cs.getFont();
+
+                final String departmentLineColorARGBHex = "FFC6E2FF";
+                final String darkBlueARGBHEX = "FF4A62B9";
+
+                String departmentName;
+
+                if (font.getBold() && font.getFontHeightInPoints() == 8 && departmentCell.getCellType() == CellType.STRING) {
+                    if (cs.getFillForegroundColorColor().getARGBHex().equals(departmentLineColorARGBHex)) {
+
+                        departmentName = departmentCell.getStringCellValue();
+                        Department department = new Department(departmentName);
+
+                        OperationLvl operationLvl = new OperationLvl(operationLvlCell.getStringCellValue());
+
+                        for (int j = departmentCell.getRowIndex() + 1; j < sheet.getPhysicalNumberOfRows(); j++) {
+                            Row rowDeep = sheet.getRow(j);
+                            Cell orderCell = rowDeep.getCell(0);
+                            Cell primenyaemostCountCell = rowDeep.getCell(6);
+                            XSSFCellStyle csDeep = (XSSFCellStyle) orderCell.getCellStyle();
+
+                            if (font.getBold() && font.getFontHeightInPoints() == 8 && orderCell.getCellType() == CellType.STRING) {
+                                if (csDeep.getFillForegroundColorColor() != null && !csDeep.getFillForegroundColorColor().getARGBHex().equals("FFDCF1FF")) {
+                                    if (csDeep.getFillForegroundColorColor().getARGBHex().equals(departmentLineColorARGBHex)
+                                            || csDeep.getFillForegroundColorColor().getARGBHex().equals(darkBlueARGBHEX)) {
+                                        break;
+                                    }
+                                    Order order = new Order(orderCell.getStringCellValue());
+                                    order.setPrimenyaemostCount(primenyaemostCountCell.getNumericCellValue());
+                                    operationLvl.getOrdersList().add(order);
+                                }
+                            }
+                        }
+
+                        department.getOperationsLvlList().add(operationLvl);
+                        readOperPlans(department);
+                        departmentMap.put(departmentName, department);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readOperPlans(Department department) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(allNomenclatureTableFile))) {
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+                Row row = sheet.getRow(i);
+                Cell orderCell = row.getCell(6);
+                Cell zakazPokypatelyaCell = row.getCell(14);
+
+                switch (orderCell.getCellType()) {
+                    case STRING: {
+                        for (OperationLvl operationLvl : department.getOperationsLvlList()) {
+                            for (Order order : operationLvl.getOrdersList()) {
+                                if (order.getName().trim().equals(orderCell.getStringCellValue().trim())) {
+                                    order.setZakazPokypatelya(zakazPokypatelyaCell.getStringCellValue());
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    case NUMERIC: {
+                        for (OperationLvl operationLvl : department.getOperationsLvlList()) {
+                            for (Order order : operationLvl.getOrdersList()) {
+                                if (order.getName().trim().equals(String.valueOf(orderCell.getNumericCellValue()).trim())) {
+                                    order.setZakazPokypatelya(zakazPokypatelyaCell.getStringCellValue());
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readOstatki(File file, Department department) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file))) {
+            XSSFSheet sheet = workbook.getSheetAt(0);
+
+            for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+                Row row = sheet.getRow(i);
+
+                Cell departmentCell = row.getCell(0);
+
+                XSSFCellStyle cs = (XSSFCellStyle) departmentCell.getCellStyle();
+                XSSFFont font = cs.getFont();
+
+                final String departmentLineColorARGBHex = "FFC6E2FF";
+                final String violetOperationLvlColorRGBHEx = "FFE6E6FA";
+
+                String departmentName;
+                if (font.getBold() && font.getFontHeightInPoints() == 8 && departmentCell.getCellType() == CellType.STRING) {
+                    if (cs.getFillForegroundColorColor().getARGBHex().equals(departmentLineColorARGBHex)) {
+                        departmentName = departmentCell.getStringCellValue();
+                        if (department.getName().trim().equals(departmentName.trim())) {
+                            for (int j = departmentCell.getRowIndex() + 1; j < sheet.getPhysicalNumberOfRows(); j++) {
+                                Row rowDeep = sheet.getRow(j);
+
+                                Cell firstCellDeep = rowDeep.getCell(0);
+                                Cell operationLvlCell = rowDeep.getCell(5);
+
+                                XSSFCellStyle csDeep = (XSSFCellStyle) firstCellDeep.getCellStyle();
+
+                                if (csDeep.getFillForegroundColorColor() != null) {
+                                    String currentARGBHex = csDeep.getFillForegroundColorColor().getARGBHex();
+                                    if (csDeep.getFillForegroundColorColor().getARGBHex().equals(departmentLineColorARGBHex)) {
+                                        break;
+                                    }
+
+                                    if (currentARGBHex.equals(violetOperationLvlColorRGBHEx)) {
+                                        for (OperationLvl operationLvl : department.getOperationsLvlList()) {
+                                            if (operationLvl.getName().trim().equals(operationLvlCell.getStringCellValue().trim())) {
+                                                for (int k = rowDeep.getRowNum() + 1; k < sheet.getPhysicalNumberOfRows(); k++) {
+                                                    Row rowDeepDeep = sheet.getRow(k);
+                                                    Cell zakazPokypatelyaDeepDeep = rowDeepDeep.getCell(0);
+                                                    XSSFCellStyle csDeepDeep = (XSSFCellStyle) zakazPokypatelyaDeepDeep.getCellStyle();
+
+                                                    if (csDeepDeep.getFillForegroundColorColor() != null) {
+                                                        if (csDeepDeep.getFillForegroundColorColor().getARGBHex().equals(violetOperationLvlColorRGBHEx)) {
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (zakazPokypatelyaDeepDeep.getCellType() == CellType.STRING && zakazPokypatelyaDeepDeep.getStringCellValue().contains("покупателя")) {
+                                                        String currentCellZakazPokypatelya = zakazPokypatelyaDeepDeep.getStringCellValue();
+
+                                                        for (Order order : operationLvl.getOrdersList()) {
+                                                            if (order.getZakazPokypatelya() != null && order.getZakazPokypatelya().trim().equals(currentCellZakazPokypatelya.trim())) {
+                                                                Cell prihodCell = rowDeepDeep.getCell(10);
+                                                                order.setFaktReleaseCount(prihodCell.getNumericCellValue());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -297,7 +513,7 @@ public class CellsCounter {
                 for (Department department : excelFile.getDepartmentList()) {
                     if (department.getName().equals(departmentName)) {
 
-                        String redARGBHEX = "FFFFC0CB";
+                        final String redARGBHEX = "FFFFC0CB";
 
                         //if this dse red
                         if (cs.getFillForegroundColorColor().getARGBHex().equals(redARGBHEX)) {
@@ -366,7 +582,7 @@ public class CellsCounter {
 
             Row row = allSheet.getRow(0);
             for (Cell cell : row) {
-                //если это обычный номер заказа
+                //if it is regular orderNumber
                 if (cell.getCellType() == CellType.STRING) {
                     XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
                     if (cs.getAlignment() == HorizontalAlignment.CENTER) {
@@ -375,7 +591,7 @@ public class CellsCounter {
                         readColumn(cell.getColumnIndex(), allSheet, order);
                         orders.add(order);
                     }
-                    //если это ебучий ЗИП
+                    //if it ZIP
                 } else if (cell.getCellType() == CellType.NUMERIC
                         && (cell.getNumericCellValue() == 765
                         || cell.getNumericCellValue() == 7654
@@ -449,7 +665,7 @@ public class CellsCounter {
                         continue;
                     }
 
-                    String blueARGBHex = "FFC6E2FF";
+                    final String blueARGBHex = "FFC6E2FF";
 
                     if (cs.getFillForegroundColorColor().getARGBHex().equals(blueARGBHex)) {
                         String orderNumber = cell.getStringCellValue().substring(0, cell.getStringCellValue().lastIndexOf(',')).trim();
@@ -846,7 +1062,7 @@ public class CellsCounter {
         }
     }
 
-    private void writeIntoExcel(File directory, File file) throws IOException {
+    private void writeResultIntoRepeatCountTable(File directory, File file) throws IOException {
         XSSFWorkbook book;
         if (!Files.exists(file.toPath())) {
             Files.createDirectories(directory.toPath());

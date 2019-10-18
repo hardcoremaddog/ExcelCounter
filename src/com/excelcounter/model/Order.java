@@ -14,6 +14,10 @@ public class Order {
     private int redCells;
     private int yellowCells;
 
+    private double primenyaemostCount;
+    private double faktReleaseCount = 0;
+    private String zakazPokypatelya;
+
     public ArrayList<Department> getDepartments() {
         return departments;
     }
@@ -37,4 +41,30 @@ public class Order {
     public void setYellowCells(int yellowCells) {
         this.yellowCells = yellowCells;
     }
+
+    public String getZakazPokypatelya() {
+        return zakazPokypatelya;
+    }
+
+    public void setZakazPokypatelya(String zakazPokypatelya) {
+        this.zakazPokypatelya = zakazPokypatelya;
+    }
+
+    public double getPrimenyaemostCount() {
+        return primenyaemostCount;
+    }
+
+    public void setPrimenyaemostCount(double primenyaemostCount) {
+        this.primenyaemostCount = primenyaemostCount;
+    }
+
+    public double getFaktReleaseCount() {
+        return faktReleaseCount;
+    }
+
+    public void setFaktReleaseCount(double faktReleaseCount) {
+        this.faktReleaseCount = faktReleaseCount;
+    }
 }
+
+

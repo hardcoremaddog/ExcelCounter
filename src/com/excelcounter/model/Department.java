@@ -1,5 +1,7 @@
 package com.excelcounter.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -11,10 +13,18 @@ public class Department {
     private int redCellsCount;
     private int yellowCellsCount;
 
+    private List<OperationLvl> operationsLvlList = new ArrayList<>();
+
+    private List<Order> ordersList = new ArrayList<>();
     private Set<String> dseTreeSet = new TreeSet<>();
 
+    //getters and setters
     public Set<String> getDseTreeSet() {
         return dseTreeSet;
+    }
+
+    public void setDseTreeSet(Set<String> dseTreeSet) {
+        this.dseTreeSet = dseTreeSet;
     }
 
     public Department(String name) {
@@ -47,5 +57,13 @@ public class Department {
 
     public void setYellowCellsCount(int yellowCellsCount) {
         this.yellowCellsCount = yellowCellsCount;
+    }
+
+    public List<OperationLvl> getOperationsLvlList() {
+        return operationsLvlList;
+    }
+
+    public List<Order> getOrdersList() {
+        return ordersList;
     }
 }
