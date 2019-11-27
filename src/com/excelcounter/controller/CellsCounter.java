@@ -53,6 +53,7 @@ public class CellsCounter {
     private final String UVK = "Управление внешней комплектации";
     private final String OMZK = "Отдел межзаводской кооперации";
     private final String OMZK_new = "Отдел материального обеспечения и сервисных закупок";
+    private final String OMZK_new2 = "Отдел межзаводской кооперации*";
     private final String OMO = "Отдел материального обеспечения";
     private final String MMZ02 = "02ММЗ ММЗ Цех 02";
 
@@ -81,6 +82,7 @@ public class CellsCounter {
         departmentListFull.add(new Department(UVK));
         departmentListFull.add(new Department(OMZK));
         departmentListFull.add(new Department(OMZK_new));
+        departmentListFull.add(new Department(OMZK_new2));
         departmentListFull.add(new Department(OMO));
         departmentListFull.add(new Department(MMZ02));
         departmentListFull.add(new Department(ELMASH));
@@ -221,6 +223,7 @@ public class CellsCounter {
                 System.out.println("Результат записан в файл по пути: " + resultFile.getAbsolutePath());
             }
 
+            //releaseAnalysis
             if (param == 6) {
                 readMainForReleaseAnalysis();
 
@@ -292,7 +295,7 @@ public class CellsCounter {
                 if (font.getBold() && font.getFontHeightInPoints() == 8 && departmentCell.getCellType() == CellType.STRING) {
                     if (cs.getFillForegroundColorColor().getARGBHex().equals(departmentLineColorARGBHex)) {
 
-                        departmentName = departmentCell.getStringCellValue();
+                        departmentName = departmentCell.getStringCellValue().replaceAll("\\*","");
                         Department department = new Department(departmentName);
 
                         OperationLvl operationLvl = new OperationLvl(operationLvlCell.getStringCellValue());
@@ -382,7 +385,7 @@ public class CellsCounter {
                 String departmentName;
                 if (font.getBold() && font.getFontHeightInPoints() == 8 && departmentCell.getCellType() == CellType.STRING) {
                     if (cs.getFillForegroundColorColor().getARGBHex().equals(departmentLineColorARGBHex)) {
-                        departmentName = departmentCell.getStringCellValue();
+                        departmentName = departmentCell.getStringCellValue().replaceAll("\\*","");
                         if (department.getName().trim().equals(departmentName.trim())) {
                             for (int j = departmentCell.getRowIndex() + 1; j < sheet.getPhysicalNumberOfRows(); j++) {
                                 Row rowDeep = sheet.getRow(j);
@@ -450,7 +453,7 @@ public class CellsCounter {
                     XSSFFont font = cs.getFont();
 
                     if (font.getBold() && font.getFontHeightInPoints() == 8 && cell.getCellType() == CellType.STRING) {
-                        String departmentName = cell.getStringCellValue();
+                        String departmentName = cell.getStringCellValue().replaceAll("\\*","");
                         readDSE(i + 1, sheet, departmentName, new ExcelFile(file.getName()), false);
                     }
                 }
@@ -478,7 +481,7 @@ public class CellsCounter {
                         XSSFFont font = cs.getFont();
 
                         if (font.getBold() && font.getFontHeightInPoints() == 8 && cell.getCellType() == CellType.STRING) {
-                            String departmentName = cell.getStringCellValue();
+                            String departmentName = cell.getStringCellValue().replaceAll("\\*", "");
                             excelFile.getDepartmentList().add(new Department(departmentName));
                             readDSE(i + 1, sheet, departmentName, excelFile, true);
                         }
@@ -643,7 +646,7 @@ public class CellsCounter {
             XSSFFont font = cs.getFont();
 
             if (font.getBold() && font.getFontHeightInPoints() == 8) {
-                String departmentName = row.getCell(0).getStringCellValue();
+                String departmentName = row.getCell(0).getStringCellValue().replaceAll("\\*","");
                 Department department = new Department(departmentName);
                 count(rowNum, columnNum, sheet, order, department);
             }
@@ -666,7 +669,6 @@ public class CellsCounter {
                     }
 
                     final String blueARGBHex = "FFC6E2FF";
-
                     if (cs.getFillForegroundColorColor().getARGBHex().equals(blueARGBHex)) {
                         String orderNumber = cell.getStringCellValue().substring(0, cell.getStringCellValue().lastIndexOf(',')).trim();
                         OrderSbyt orderSbyt = new OrderSbyt(orderNumber);
@@ -783,7 +785,8 @@ public class CellsCounter {
                                     break;
                                 }
                                 case OMZK:
-                                case OMZK_new: {
+                                case OMZK_new:
+                                case OMZK_new2: {
                                     row.getCell(4).setCellValue(department.getYellowCellsCount());
                                     row.getCell(8).setCellValue(department.getRedCellsCount());
                                     break;
@@ -899,7 +902,8 @@ public class CellsCounter {
                                     break;
                                 }
                                 case OMZK:
-                                case OMZK_new: {
+                                case OMZK_new:
+                                case OMZK_new2: {
                                     row.getCell(4).setCellValue(department.getYellowCellsCount());
                                     row.getCell(8).setCellValue(department.getRedCellsCount());
                                     break;
@@ -990,7 +994,8 @@ public class CellsCounter {
                                     break;
                                 }
                                 case OMZK:
-                                case OMZK_new: {
+                                case OMZK_new:
+                                case OMZK_new2: {
                                     row.getCell(9).setCellValue(department.getYellowCellsCount());
                                     row.getCell(6).setCellValue(department.getRedCellsCount());
                                     break;
