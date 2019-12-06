@@ -18,13 +18,13 @@ public class GUI extends JFrame {
     private File table;
     private File sbyt;
 
-    private JButton allFileChooserButton = new JButton("Выбрать книгу .xlsx с данными");
+    private JButton allFileChooserButton = new JButton("Выбрать .xlsx файл со всякой хуйней");
     private JButton sbytFileChooseButton = new JButton("Выбрать книгу .xlsx КПНС");
     private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx/.xlsm с таблицей");
 
     private JButton advancedGUIShowButton = new JButton("Перейти на дополнительный интерфейс");
 
-    private JLabel allFilePathLabel = new JLabel();
+    public JLabel allFilePathLabel = new JLabel();
     private JLabel sbytFilePathLabel = new JLabel();
     private JLabel tableFilePathLabel = new JLabel();
 
@@ -38,39 +38,26 @@ public class GUI extends JFrame {
     private JCheckBox check = new JCheckBox("Вывести результат подсчета в консоль", true);
     private JCheckBox win95colors = new JCheckBox("Win95 cell colors", false);
 
-    private JButton startWork = new JButton("Посчитать и записать");
+    private JButton startWork = new JButton("Работай за меня, раб!");
 
     public JProgressBar progressBar = new JProgressBar();
 
     GUI() {
-        super("ExcelCounter " + Main.VERSION);
-        this.setBounds(100, 100, 900, 350);
+        super("Можно не работать, пожалуйста " + Main.VERSION);
+        this.setBounds(100, 100, 400, 250);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container container = this.getContentPane();
-        container.setLayout(new GridLayout(5, 4, 1, 1));
+        container.setLayout(new GridLayout(4, 1, 1, 1));
 
         container.add(allFileChooserButton);
-        container.add(sbytFileChooseButton);
-        container.add(tableFileChooseButton);
         container.add(allFilePathLabel);
-        container.add(sbytFilePathLabel);
-        container.add(tableFilePathLabel);
 
         ButtonGroup group = new ButtonGroup();
-        group.add(table765Radio);
-        group.add(table753Radio);
-        group.add(tableOrdersRadio);
-
         group.add(stuntmanMikeRadio);
 
-        container.add(tableTypeLabel);
-        container.add(table765Radio);
-        container.add(table753Radio);
-        container.add(tableOrdersRadio);
-
         stuntmanMikeRadio.setSelected(true);
-        container.add(stuntmanMikeRadio);
+//        container.add(stuntmanMikeRadio);
 
         allFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
         sbytFileChooseButton.addActionListener(new sbytFileChooseButtonActionListener());
@@ -78,13 +65,12 @@ public class GUI extends JFrame {
         advancedGUIShowButton.addActionListener(new AdvancedGUIShowButtonActionListener());
         advancedGUIShowButton.setDefaultCapable(true);
         startWork.addActionListener(new CountButtonEventListener(this));
-        container.add(check);
+//        container.add(check);
 //        container.add(win95colors);
 
         progressBar.setStringPainted(true);
         progressBar.setMinimum(0);
         progressBar.setMaximum(100);
-        container.add(advancedGUIShowButton);
         container.add(progressBar);
         container.add(startWork);
     }
@@ -113,7 +99,7 @@ public class GUI extends JFrame {
             if (ret == JFileChooser.APPROVE_OPTION) {
                 checkFile(allFileChooser);
                 all = allFileChooser.getSelectedFile();
-                allFilePathLabel.setText(all.getName());
+                allFilePathLabel.setText("                                        (¬‿¬) ху" + all.getName());
             }
         }
     }

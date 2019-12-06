@@ -19,9 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 
 public class CellsCounter {
     private GUI gui;
@@ -159,6 +157,9 @@ public class CellsCounter {
             writeStuntFile(all);
 
             gui.progressBar.setValue(100);
+            gui.allFilePathLabel.setText("                                             (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ ХОБА!");
+
+            System.out.println("Я всё! Можно закрыть это окно и открывать свой файл.");
         }
 
         //transfer to sbyt control count
@@ -329,6 +330,8 @@ public class CellsCounter {
             } else {
                 sheetCountries = workbook.createSheet("По странам");
             }
+            sheetCountries.setColumnWidth(1, 10000);
+            sheetCountries.setColumnWidth(2, 5000);
 
             XSSFSheet sheetProducts;
             if (workbook.getSheet("По продукции") != null) {
@@ -336,6 +339,8 @@ public class CellsCounter {
             } else {
                 sheetProducts = workbook.createSheet("По продукции");
             }
+            sheetProducts.setColumnWidth(1, 38000);
+            sheetProducts.setColumnWidth(2, 5000);
 
             XSSFSheet sheetViewOfProducts;
             if (workbook.getSheet("По виду") != null) {
@@ -343,6 +348,8 @@ public class CellsCounter {
             } else {
                 sheetViewOfProducts = workbook.createSheet("По виду");
             }
+            sheetViewOfProducts.setColumnWidth(1, 30000);
+            sheetViewOfProducts.setColumnWidth(2, 5000);
 
             //by countries
             int rowIndex = 2;
@@ -409,6 +416,34 @@ public class CellsCounter {
                 rowIndex++;
             }
 
+            double countryTotalWeightFULL = 0;
+            for (int i = 0; i < sheetCountries.getPhysicalNumberOfRows() + 2; i++) {
+                Row row = sheetCountries.getRow(i);
+
+                try {
+                    countryTotalWeightFULL += row.getCell(2).getNumericCellValue();
+                } catch (Exception e) {
+                    //it's ok
+                }
+            }
+
+            Row row = sheetCountries.getRow(2);
+
+            Cell nameCell = row.getCell(1);
+            Cell totalCell = row.getCell(2);
+
+            nameCell.setCellValue("Страны");
+            totalCell.setCellValue(countryTotalWeightFULL);
+
+            CellStyle style = workbook.createCellStyle();
+            Font font = workbook.createFont();
+            font.setBold(true);
+            font.setFontHeightInPoints((short) 14);
+            style.setFont(font);
+
+            nameCell.setCellStyle(style);
+            totalCell.setCellStyle(style);
+
             try (FileOutputStream tableFileOutputStream = new FileOutputStream(all)) {
                 workbook.write(tableFileOutputStream);
             } catch (IOException e) {
@@ -452,7 +487,7 @@ public class CellsCounter {
                 if (font.getBold() && font.getFontHeightInPoints() == 8 && departmentCell.getCellType() == CellType.STRING) {
                     if (cs.getFillForegroundColorColor().getARGBHex().equals(departmentLineColorARGBHex)) {
 
-                        departmentName = departmentCell.getStringCellValue().replaceAll("\\*","");
+                        departmentName = departmentCell.getStringCellValue().replaceAll("\\*", "");
                         Department department = new Department(departmentName);
 
                         OperationLvl operationLvl = new OperationLvl(operationLvlCell.getStringCellValue());
@@ -542,7 +577,7 @@ public class CellsCounter {
                 String departmentName;
                 if (font.getBold() && font.getFontHeightInPoints() == 8 && departmentCell.getCellType() == CellType.STRING) {
                     if (cs.getFillForegroundColorColor().getARGBHex().equals(departmentLineColorARGBHex)) {
-                        departmentName = departmentCell.getStringCellValue().replaceAll("\\*","");
+                        departmentName = departmentCell.getStringCellValue().replaceAll("\\*", "");
                         if (department.getName().trim().equals(departmentName.trim())) {
                             for (int j = departmentCell.getRowIndex() + 1; j < sheet.getPhysicalNumberOfRows(); j++) {
                                 Row rowDeep = sheet.getRow(j);
@@ -610,7 +645,7 @@ public class CellsCounter {
                     XSSFFont font = cs.getFont();
 
                     if (font.getBold() && font.getFontHeightInPoints() == 8 && cell.getCellType() == CellType.STRING) {
-                        String departmentName = cell.getStringCellValue().replaceAll("\\*","");
+                        String departmentName = cell.getStringCellValue().replaceAll("\\*", "");
                         readDSE(i + 1, sheet, departmentName, new ExcelFile(file.getName()), false);
                     }
                 }
@@ -803,7 +838,7 @@ public class CellsCounter {
             XSSFFont font = cs.getFont();
 
             if (font.getBold() && font.getFontHeightInPoints() == 8) {
-                String departmentName = row.getCell(0).getStringCellValue().replaceAll("\\*","");
+                String departmentName = row.getCell(0).getStringCellValue().replaceAll("\\*", "");
                 Department department = new Department(departmentName);
                 count(rowNum, columnNum, sheet, order, department);
             }
