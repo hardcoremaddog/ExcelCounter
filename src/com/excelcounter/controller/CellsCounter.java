@@ -19,12 +19,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 public class CellsCounter {
     private GUI gui;
     private AdvancedGUI advancedGUI;
 
     private boolean win95colors;
+
+    private List<StuntRow> stuntRowsList = new ArrayList<>();
+
+    private Set<String> countriesUniqueSet = new TreeSet<>();
+    private Set<String> productUniqueSet = new TreeSet<>();
+    private Set<String> viewOfProductUniqueSet = new TreeSet<>();
 
     private List<File> allFiles;
     private List<File> directories;
@@ -123,7 +132,7 @@ public class CellsCounter {
         this.win95colors = win95colors;
 
         //all table red and yellow cells count
-        if (all != null) {
+        if (all != null && param != 7) {
             readMain(all);
             if (showResult) {
                 if (all != null) {
@@ -142,6 +151,14 @@ public class CellsCounter {
                     }
                 }
             }
+        }
+
+        //todo Stuntman func
+        if (all != null && param == 7) {
+            readStuntFile(all);
+            writeStuntFile(all);
+
+            gui.progressBar.setValue(100);
         }
 
         //transfer to sbyt control count
@@ -259,6 +276,146 @@ public class CellsCounter {
 
         if (advancedGUI != null) {
             advancedGUI.progressBar.setValue(100);
+        }
+    }
+
+    private void readStuntFile(File file) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file))) {
+
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+                Row row = sheet.getRow(i);
+
+                if (row.getCell(0) == null || row.getCell(0).getCellType() == CellType.STRING) {
+                    continue;
+                }
+
+                Cell numberPPCell = row.getCell(0);
+                Cell yearCell = row.getCell(1);
+                Cell countryCell = row.getCell(2);
+                Cell productCell = row.getCell(6);
+                Cell viewOfProductCell = row.getCell(7);
+                Cell cargoTotalWeightCell = row.getCell(15);
+
+                StuntRow stuntRow = new StuntRow((int) numberPPCell.getNumericCellValue());
+                stuntRow.setYear((int) yearCell.getNumericCellValue());
+
+                stuntRow.setCountry(countryCell.getStringCellValue());
+                countriesUniqueSet.add(countryCell.getStringCellValue());
+
+                stuntRow.setProduct(productCell.getStringCellValue());
+                productUniqueSet.add(productCell.getStringCellValue());
+
+                stuntRow.setViewOfProduct(viewOfProductCell.getStringCellValue());
+                viewOfProductUniqueSet.add(viewOfProductCell.getStringCellValue());
+
+                stuntRow.setCargoTotalWeight((int) cargoTotalWeightCell.getNumericCellValue());
+
+                stuntRowsList.add(stuntRow);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeStuntFile(File all) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(all))) {
+
+            workbook.setSheetName(workbook.getSheetIndex(workbook.getSheetAt(0)), "Ввоз");
+
+            XSSFSheet sheetCountries;
+            if (workbook.getSheet("По странам") != null) {
+                sheetCountries = workbook.getSheet("По странам");
+            } else {
+                sheetCountries = workbook.createSheet("По странам");
+            }
+
+            XSSFSheet sheetProducts;
+            if (workbook.getSheet("По продукции") != null) {
+                sheetProducts = workbook.getSheet("По продукции");
+            } else {
+                sheetProducts = workbook.createSheet("По продукции");
+            }
+
+            XSSFSheet sheetViewOfProducts;
+            if (workbook.getSheet("По виду") != null) {
+                sheetViewOfProducts = workbook.getSheet("По виду");
+            } else {
+                sheetViewOfProducts = workbook.createSheet("По виду");
+            }
+
+            //by countries
+            int rowIndex = 2;
+            int nameCellIndex = 1;
+            int totalWeighIndex = 2;
+            for (String country : countriesUniqueSet) {
+
+                Row row = sheetCountries.createRow(rowIndex);
+                Cell countryNameCell = row.createCell(nameCellIndex);
+                Cell totalWeighCell = row.createCell(totalWeighIndex);
+
+                double countryTotalWeight = 0;
+                countryTotalWeight += stuntRowsList.stream()
+                        .filter(stuntRow -> stuntRow.getCountry().equalsIgnoreCase(country))
+                        .flatMapToDouble(stuntRow -> DoubleStream.of(stuntRow.getCargoTotalWeight()))
+                        .sum();
+
+                if (countryTotalWeight > 0) {
+                    countryNameCell.setCellValue(country);
+                    totalWeighCell.setCellValue(countryTotalWeight / 1000);
+                }
+                rowIndex++;
+            }
+
+            //by product
+            rowIndex = 2;
+            for (String product : productUniqueSet) {
+
+                Row row = sheetProducts.createRow(rowIndex);
+                Cell countryNameCell = row.createCell(nameCellIndex);
+                Cell totalWeighCell = row.createCell(totalWeighIndex);
+
+                double productTotalWeight = 0;
+                productTotalWeight += stuntRowsList.stream()
+                        .filter(stuntRow -> stuntRow.getProduct().equalsIgnoreCase(product))
+                        .flatMapToDouble(stuntRow -> DoubleStream.of(stuntRow.getCargoTotalWeight()))
+                        .sum();
+
+                if (productTotalWeight > 0) {
+                    countryNameCell.setCellValue(product);
+                    totalWeighCell.setCellValue(productTotalWeight / 1000);
+                }
+                rowIndex++;
+            }
+
+            //by viewOfProduct
+            rowIndex = 2;
+            for (String viewOfProduct : viewOfProductUniqueSet) {
+
+                Row row = sheetViewOfProducts.createRow(rowIndex);
+                Cell countryNameCell = row.createCell(nameCellIndex);
+                Cell totalWeighCell = row.createCell(totalWeighIndex);
+
+                double viewTotalWeight = 0;
+                viewTotalWeight += stuntRowsList.stream()
+                        .filter(stuntRow -> stuntRow.getViewOfProduct().equalsIgnoreCase(viewOfProduct))
+                        .flatMapToDouble(stuntRow -> DoubleStream.of(stuntRow.getCargoTotalWeight()))
+                        .sum();
+
+                if (viewTotalWeight > 0) {
+                    countryNameCell.setCellValue(viewOfProduct);
+                    totalWeighCell.setCellValue(viewTotalWeight / 1000);
+                }
+                rowIndex++;
+            }
+
+            try (FileOutputStream tableFileOutputStream = new FileOutputStream(all)) {
+                workbook.write(tableFileOutputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

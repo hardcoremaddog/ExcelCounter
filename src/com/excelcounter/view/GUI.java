@@ -33,6 +33,8 @@ public class GUI extends JFrame {
     private JRadioButton table753Radio = new JRadioButton("753");
     private JRadioButton tableOrdersRadio = new JRadioButton("Заказы");
 
+    private JRadioButton stuntmanMikeRadio = new JRadioButton("Stuntman Mike");
+
     private JCheckBox check = new JCheckBox("Вывести результат подсчета в консоль", true);
     private JCheckBox win95colors = new JCheckBox("Win95 cell colors", false);
 
@@ -60,11 +62,15 @@ public class GUI extends JFrame {
         group.add(table753Radio);
         group.add(tableOrdersRadio);
 
+        group.add(stuntmanMikeRadio);
+
         container.add(tableTypeLabel);
         container.add(table765Radio);
-        table765Radio.setSelected(true);
         container.add(table753Radio);
         container.add(tableOrdersRadio);
+
+        stuntmanMikeRadio.setSelected(true);
+        container.add(stuntmanMikeRadio);
 
         allFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
         sbytFileChooseButton.addActionListener(new sbytFileChooseButtonActionListener());
@@ -73,7 +79,7 @@ public class GUI extends JFrame {
         advancedGUIShowButton.setDefaultCapable(true);
         startWork.addActionListener(new CountButtonEventListener(this));
         container.add(check);
-        container.add(win95colors);
+//        container.add(win95colors);
 
         progressBar.setStringPainted(true);
         progressBar.setMinimum(0);
@@ -152,24 +158,15 @@ public class GUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             CellsCounter cellsCounter;
-            if (all == null && sbyt == null) {
-                System.out.println("Необходимо выбрать по крайней мере один файл книги с данными!");
-                return;
-            } else if (table != null) {
-                cellsCounter = new CellsCounter(all, table, sbyt, gui);
+
+            if (all != null) {
+                cellsCounter = new CellsCounter(all, gui);
             } else {
-                cellsCounter = new CellsCounter(all, sbyt, gui);
+                System.out.println("Файл не выбран!");
+                return;
             }
 
-            int param;
-            if (table753Radio.isSelected()) {
-                param = 2;
-            } else if (tableOrdersRadio.isSelected()) {
-                param = 3;
-            } else {
-                param = 1;
-            }
-            cellsCounter.finalWorkWithData(param, gui.check.isSelected(), gui.win95colors.isSelected());
+            cellsCounter.finalWorkWithData(7, true, false);
         }
     }
 
