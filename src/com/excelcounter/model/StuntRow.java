@@ -2,24 +2,13 @@ package com.excelcounter.model;
 
 public class StuntRow {
 
-    private int numberPP;
-
-    private int year;
     private String country;
     private String product;
     private String viewOfProduct;
     private double cargoTotalWeight;
 
-    public StuntRow(int numberPP) {
-        this.numberPP = numberPP;
-    }
+    public StuntRow() {
 
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
     }
 
     public String getCountry() {
@@ -51,10 +40,6 @@ public class StuntRow {
     }
 
     public void setCargoTotalWeight(double cargoTotalWeight) {
-        this.cargoTotalWeight = cargoTotalWeight;
-    }
-
-    public void setCargoTotalWeight(int cargoTotalWeight) {
         this.cargoTotalWeight = cargoTotalWeight;
     }
 }

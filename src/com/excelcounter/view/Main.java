@@ -27,8 +27,8 @@ public class Main {
         if (!file.exists() && !file.isFile()) {
             throw new FileNotFoundException("Неверно указан путь до книги excel с данными. Книги по этому пути не существует!");
         }
-        if (!file.getName().endsWith(".xlsx") && !file.getName().endsWith(".xlsm")) {
-            throw new UnsupportedOperationException("Файл не является книгой excel формата .xlsx или .xlsm");
+        if (!file.getName().endsWith(".xls") && !file.getName().endsWith(".xlsx") && !file.getName().endsWith(".xlsm")) {
+            throw new UnsupportedOperationException("Файл не является книгой excel формата .xls, .xlsx или .xlsm");
         }
     }
 }

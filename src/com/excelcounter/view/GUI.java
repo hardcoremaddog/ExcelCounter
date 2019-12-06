@@ -17,8 +17,6 @@ public class GUI extends JFrame {
     private JButton allFileChooserButton = new JButton("Выбрать .xlsx файл с данными");
     public JLabel allFilePathLabel = new JLabel();
 
-    private JRadioButton stuntmanMikeRadio = new JRadioButton("Stuntman Mike");
-
     private JButton startWork = new JButton("ПОСЧИТАТЬ ДАННЫЕ");
 
     public JProgressBar progressBar = new JProgressBar();
@@ -34,10 +32,6 @@ public class GUI extends JFrame {
         container.add(allFileChooserButton);
         container.add(allFilePathLabel);
 
-        ButtonGroup group = new ButtonGroup();
-        group.add(stuntmanMikeRadio);
-        stuntmanMikeRadio.setSelected(true);
-
         allFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
 
         startWork.addActionListener(new CountButtonEventListener(this));
@@ -50,7 +44,7 @@ public class GUI extends JFrame {
     }
 
     private void setXLSXFilter(JFileChooser fileChooser) {
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("XLSX/XLSM files", "xlsx", "xlsm");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("XLS/XLSX/XLSM files", "xls", "xlsx", "xlsm");
         fileChooser.setFileFilter(filter);
     }
 
@@ -95,8 +89,7 @@ public class GUI extends JFrame {
                 System.out.println("Файл не выбран!");
                 return;
             }
-
-            cellsCounter.finalWorkWithData(7, true, false);
+            cellsCounter.finalWorkWithData();
         }
     }
 }
