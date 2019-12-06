@@ -12,38 +12,19 @@ import java.io.IOException;
 
 public class GUI extends JFrame {
 
-    private GUI gui = this;
-
     private File all;
-    private File table;
-    private File sbyt;
 
-    private JButton allFileChooserButton = new JButton("Выбрать .xlsx файл со всякой хуйней");
-    private JButton sbytFileChooseButton = new JButton("Выбрать книгу .xlsx КПНС");
-    private JButton tableFileChooseButton = new JButton("Выбрать книгу .xlsx/.xlsm с таблицей");
-
-    private JButton advancedGUIShowButton = new JButton("Перейти на дополнительный интерфейс");
-
+    private JButton allFileChooserButton = new JButton("Выбрать .xlsx файл с данными");
     public JLabel allFilePathLabel = new JLabel();
-    private JLabel sbytFilePathLabel = new JLabel();
-    private JLabel tableFilePathLabel = new JLabel();
-
-    private JLabel tableTypeLabel = new JLabel("Тип таблицы для записи данных");
-    private JRadioButton table765Radio = new JRadioButton("765 и СПб");
-    private JRadioButton table753Radio = new JRadioButton("753");
-    private JRadioButton tableOrdersRadio = new JRadioButton("Заказы");
 
     private JRadioButton stuntmanMikeRadio = new JRadioButton("Stuntman Mike");
 
-    private JCheckBox check = new JCheckBox("Вывести результат подсчета в консоль", true);
-    private JCheckBox win95colors = new JCheckBox("Win95 cell colors", false);
-
-    private JButton startWork = new JButton("Работай за меня, раб!");
+    private JButton startWork = new JButton("ПОСЧИТАТЬ ДАННЫЕ");
 
     public JProgressBar progressBar = new JProgressBar();
 
     GUI() {
-        super("Можно не работать, пожалуйста " + Main.VERSION);
+        super("FriendlyExcelJavaWorker " + Main.VERSION);
         this.setBounds(100, 100, 400, 250);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -55,18 +36,11 @@ public class GUI extends JFrame {
 
         ButtonGroup group = new ButtonGroup();
         group.add(stuntmanMikeRadio);
-
         stuntmanMikeRadio.setSelected(true);
-//        container.add(stuntmanMikeRadio);
 
         allFileChooserButton.addActionListener(new allFileChooseButtonActionListener());
-        sbytFileChooseButton.addActionListener(new sbytFileChooseButtonActionListener());
-        tableFileChooseButton.addActionListener(new TableFileChooseButtonActionListener());
-        advancedGUIShowButton.addActionListener(new AdvancedGUIShowButtonActionListener());
-        advancedGUIShowButton.setDefaultCapable(true);
+
         startWork.addActionListener(new CountButtonEventListener(this));
-//        container.add(check);
-//        container.add(win95colors);
 
         progressBar.setStringPainted(true);
         progressBar.setMinimum(0);
@@ -99,37 +73,7 @@ public class GUI extends JFrame {
             if (ret == JFileChooser.APPROVE_OPTION) {
                 checkFile(allFileChooser);
                 all = allFileChooser.getSelectedFile();
-                allFilePathLabel.setText("                                        (¬‿¬) ху" + all.getName());
-            }
-        }
-    }
-
-    class sbytFileChooseButtonActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            progressBar.setValue(0);
-            JFileChooser sbytFileChooser = new JFileChooser();
-            setXLSXFilter(sbytFileChooser);
-            int ret = sbytFileChooser.showDialog(null, "Выбрать файл книги контроля передачи на сбыт");
-            if (ret == JFileChooser.APPROVE_OPTION) {
-                checkFile(sbytFileChooser);
-                sbyt = sbytFileChooser.getSelectedFile();
-                sbytFilePathLabel.setText(sbyt.getName());
-            }
-        }
-    }
-
-    class TableFileChooseButtonActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            progressBar.setValue(0);
-            JFileChooser tableFileChooser = new JFileChooser();
-            setXLSXFilter(tableFileChooser);
-            int ret = tableFileChooser.showDialog(null, "Выбрать файл книги с таблицей");
-            if (ret == JFileChooser.APPROVE_OPTION) {
-                checkFile(tableFileChooser);
-                table = tableFileChooser.getSelectedFile();
-                tableFilePathLabel.setText(table.getName());
+                allFilePathLabel.setText(" Выбран файл: " + all.getAbsolutePath());
             }
         }
     }
@@ -153,15 +97,6 @@ public class GUI extends JFrame {
             }
 
             cellsCounter.finalWorkWithData(7, true, false);
-        }
-    }
-
-    private class AdvancedGUIShowButtonActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            AdvancedGUI advancedGUI = new AdvancedGUI();
-            advancedGUI.setVisible(true);
-            gui.setVisible(false);
         }
     }
 }
