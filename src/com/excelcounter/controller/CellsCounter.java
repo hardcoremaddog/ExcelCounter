@@ -4,7 +4,10 @@ import com.excelcounter.model.StuntRow;
 import com.excelcounter.view.GUI;
 import org.apache.poi.ss.usermodel.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -15,7 +18,8 @@ public class CellsCounter {
 
     private List<StuntRow> stuntRowsList = new ArrayList<>();
 
-    private Set<String> countriesUniqueSet = new TreeSet<>();
+    private Set<String> countriesOriginUniqueSet = new TreeSet<>();
+    private Set<String> countriesImportUniqueSet = new TreeSet<>();
     private Set<String> productUniqueSet = new TreeSet<>();
     private Set<String> viewOfProductUniqueSet = new TreeSet<>();
 
@@ -58,8 +62,11 @@ public class CellsCounter {
 
             StuntRow stuntRow = new StuntRow();
 
-            stuntRow.setCountry(row.getCell(2).getStringCellValue());
-            countriesUniqueSet.add(row.getCell(2).getStringCellValue());
+            stuntRow.setCountryOrigin(row.getCell(2).getStringCellValue());
+            countriesOriginUniqueSet.add(row.getCell(2).getStringCellValue());
+
+            stuntRow.setCountryImport(row.getCell(4).getStringCellValue());
+            countriesImportUniqueSet.add(row.getCell(4).getStringCellValue());
 
             stuntRow.setProduct(row.getCell(6).getStringCellValue());
             productUniqueSet.add(row.getCell(6).getStringCellValue());
@@ -73,15 +80,119 @@ public class CellsCounter {
 
         workbook.setSheetName(workbook.getSheetIndex(workbook.getSheetAt(0)), "Ввоз");
 
-        Sheet sheetCountries;
-        if (workbook.getSheet("По странам") != null) {
-            sheetCountries = workbook.getSheet("По странам");
-        } else {
-            sheetCountries = workbook.createSheet("По странам");
-        }
-        sheetCountries.setColumnWidth(1, 10000);
-        sheetCountries.setColumnWidth(2, 5000);
+        int rowIndex = 2;
+        int nameCellIndex = 1;
+        int totalWeighIndex = 2;
 
+        double totalWeightFull = 0;
+
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 14);
+        style.setFont(font);
+
+        //by countriesOrigin
+        countriesOriginUniqueSet.remove("");
+        if (countriesOriginUniqueSet.size() > 1) {
+            Sheet sheetCountriesOrigin;
+            if (workbook.getSheet("По странам происхождения") != null) {
+                sheetCountriesOrigin = workbook.getSheet("По странам происхождения");
+            } else {
+                sheetCountriesOrigin = workbook.createSheet("По странам происхождения");
+            }
+            sheetCountriesOrigin.setColumnWidth(1, 10000);
+            sheetCountriesOrigin.setColumnWidth(2, 5000);
+
+            for (String country : countriesOriginUniqueSet) {
+                Row row = sheetCountriesOrigin.createRow(rowIndex);
+                Cell countryNameCell = row.createCell(nameCellIndex);
+                Cell totalWeighCell = row.createCell(totalWeighIndex);
+
+                double countryTotalWeight = 0;
+                for (StuntRow stuntRow : stuntRowsList) {
+                    if (stuntRow.getCountryOrigin().equals(country)) {
+                        countryTotalWeight += stuntRow.getCargoTotalWeight();
+                    }
+                }
+                if (countryTotalWeight > 0) {
+                    countryNameCell.setCellValue(country);
+                    totalWeighCell.setCellValue(countryTotalWeight / 1000);
+                }
+                rowIndex++;
+            }
+
+            for (int i = 0; i < sheetCountriesOrigin.getPhysicalNumberOfRows() + 2; i++) {
+                Row row = sheetCountriesOrigin.getRow(i);
+
+                try {
+                    totalWeightFull += row.getCell(2).getNumericCellValue();
+                } catch (Exception e) {
+                    //it's ok
+                }
+            }
+
+            Row row = sheetCountriesOrigin.getRow(2);
+            Cell nameCell = row.getCell(1);
+            Cell totalCell = row.getCell(2);
+
+            nameCell.setCellValue("Страна происхождения");
+            totalCell.setCellValue(totalWeightFull);
+
+            nameCell.setCellStyle(style);
+            totalCell.setCellStyle(style);
+        } else {
+            String country = countriesOriginUniqueSet.iterator().next();
+            System.out.println("Страна происхождения только одна, " + country + ". Смысл считать объем по одной стране? \nНичего не пишу короче.");
+        }
+
+        //by countriesImport
+        countriesImportUniqueSet.remove("");
+        if (countriesImportUniqueSet.size() > 1) {
+            Sheet sheetCountriesImport;
+            if (workbook.getSheet("По странам-имортерам") != null) {
+                sheetCountriesImport = workbook.getSheet("По странам-имортерам");
+            } else {
+                sheetCountriesImport = workbook.createSheet("По странам-имортерам");
+            }
+            sheetCountriesImport.setColumnWidth(1, 10000);
+            sheetCountriesImport.setColumnWidth(2, 5000);
+
+            rowIndex = 2;
+            for (String country : countriesImportUniqueSet) {
+                Row row = sheetCountriesImport.createRow(rowIndex);
+                Cell countryNameCell = row.createCell(nameCellIndex);
+                Cell totalWeighCell = row.createCell(totalWeighIndex);
+
+                double productTotalWeight = 0;
+                for (StuntRow stuntRow : stuntRowsList) {
+                    if (stuntRow.getCountryImport().equals(country)) {
+                        productTotalWeight += stuntRow.getCargoTotalWeight();
+                    }
+                }
+
+                if (productTotalWeight > 0) {
+                    countryNameCell.setCellValue(country);
+                    totalWeighCell.setCellValue(productTotalWeight / 1000);
+                }
+                rowIndex++;
+            }
+
+            Row row = sheetCountriesImport.getRow(2);
+            Cell nameCell = row.getCell(1);
+            Cell totalCell = row.getCell(2);
+
+            nameCell.setCellValue("Страна-импортер");
+            totalCell.setCellValue(totalWeightFull);
+
+            nameCell.setCellStyle(style);
+            totalCell.setCellStyle(style);
+        } else {
+            String country = countriesImportUniqueSet.iterator().next();
+            System.out.println("Страна-импортер только одна, " + country + ". Смысл считать объем по одной стране? \nНичего не пишу короче.");
+        }
+
+        //by product
         Sheet sheetProducts;
         if (workbook.getSheet("По продукции") != null) {
             sheetProducts = workbook.getSheet("По продукции");
@@ -91,72 +202,10 @@ public class CellsCounter {
         sheetProducts.setColumnWidth(1, 38000);
         sheetProducts.setColumnWidth(2, 5000);
 
-        Sheet sheetViewOfProducts;
-        if (workbook.getSheet("По виду") != null) {
-            sheetViewOfProducts = workbook.getSheet("По виду");
-        } else {
-            sheetViewOfProducts = workbook.createSheet("По виду");
-        }
-        sheetViewOfProducts.setColumnWidth(1, 30000);
-        sheetViewOfProducts.setColumnWidth(2, 5000);
-
-
-        //by countries
-        int rowIndex = 2;
-        int nameCellIndex = 1;
-        int totalWeighIndex = 2;
-        for (String country : countriesUniqueSet) {
-
-            Row row = sheetCountries.createRow(rowIndex);
-            Cell countryNameCell = row.createCell(nameCellIndex);
-            Cell totalWeighCell = row.createCell(totalWeighIndex);
-
-            double countryTotalWeight = 0;
-            for (StuntRow stuntRow : stuntRowsList) {
-                if (stuntRow.getCountry().equals(country)) {
-                    countryTotalWeight += stuntRow.getCargoTotalWeight();
-                }
-            }
-            if (countryTotalWeight > 0) {
-                countryNameCell.setCellValue(country);
-                totalWeighCell.setCellValue(countryTotalWeight / 1000);
-            }
-            rowIndex++;
-        }
-
-        double totalWeightFull = 0;
-        for (int i = 0; i < sheetCountries.getPhysicalNumberOfRows() + 2; i++) {
-            Row row = sheetCountries.getRow(i);
-
-            try {
-                totalWeightFull += row.getCell(2).getNumericCellValue();
-            } catch (Exception e) {
-                //it's ok
-            }
-        }
-
-        Row row = sheetCountries.getRow(2);
-
-        Cell nameCell = row.getCell(1);
-        Cell totalCell = row.getCell(2);
-
-        nameCell.setCellValue("Страны");
-        totalCell.setCellValue(totalWeightFull);
-
-        CellStyle style = workbook.createCellStyle();
-        Font font = workbook.createFont();
-        font.setBold(true);
-        font.setFontHeightInPoints((short) 14);
-        style.setFont(font);
-
-        nameCell.setCellStyle(style);
-        totalCell.setCellStyle(style);
-
-        //by product
         rowIndex = 2;
         for (String product : productUniqueSet) {
 
-            row = sheetProducts.createRow(rowIndex);
+            Row row = sheetProducts.createRow(rowIndex);
             Cell countryNameCell = row.createCell(nameCellIndex);
             Cell totalWeighCell = row.createCell(totalWeighIndex);
 
@@ -174,9 +223,9 @@ public class CellsCounter {
             rowIndex++;
         }
 
-        row = sheetProducts.getRow(2);
-        nameCell = row.getCell(1);
-        totalCell = row.getCell(2);
+        Row row = sheetProducts.getRow(2);
+        Cell nameCell = row.getCell(1);
+        Cell totalCell = row.getCell(2);
 
         nameCell.setCellValue("Продукт");
         totalCell.setCellValue(totalWeightFull);
@@ -185,6 +234,15 @@ public class CellsCounter {
         totalCell.setCellStyle(style);
 
         //by viewOfProduct
+        Sheet sheetViewOfProducts;
+        if (workbook.getSheet("По виду") != null) {
+            sheetViewOfProducts = workbook.getSheet("По виду");
+        } else {
+            sheetViewOfProducts = workbook.createSheet("По виду");
+        }
+        sheetViewOfProducts.setColumnWidth(1, 30000);
+        sheetViewOfProducts.setColumnWidth(2, 5000);
+
         rowIndex = 2;
         for (String viewOfProduct : viewOfProductUniqueSet) {
             row = sheetViewOfProducts.createRow(rowIndex);
@@ -212,22 +270,22 @@ public class CellsCounter {
         nameCell.setCellStyle(style);
         totalCell.setCellStyle(style);
 
-//            //todo count percent
-//            for (int i = 1; i < workbook.getNumberOfSheets(); i++) {
-//                Sheet sheet = workbook.getSheetAt(i);
-//                sheet.getRow(2).createCell(3).setCellValue("%");
-//                sheet.getRow(2).getCell(3).setCellStyle(style);
-//                for (int j = 3; j < sheet.getPhysicalNumberOfRows() + 2; j++) {
-//                    Row row1 = sheet.getRow(j);
-//
-//                    Cell percentCell = row1.createCell(3);
-//                    percentCell.setCellValue(row1.getCell(2).getNumericCellValue() / totalWeightFull);
-//
-//                    CellStyle percentStyle = workbook.createCellStyle();
-//                    percentStyle.setDataFormat(workbook.createDataFormat().getFormat("0.00%"));
-//                    percentCell.setCellStyle(percentStyle);
-//                }
-//            }
+        //todo count percent
+        for (int i = 1; i < workbook.getNumberOfSheets(); i++) {
+            sheet = workbook.getSheetAt(i);
+            sheet.getRow(2).createCell(3).setCellValue("%");
+            sheet.getRow(2).getCell(3).setCellStyle(style);
+            for (int j = 3; j < sheet.getPhysicalNumberOfRows() + 2; j++) {
+                Row row1 = sheet.getRow(j);
+
+                Cell percentCell = row1.createCell(3);
+                percentCell.setCellValue(row1.getCell(2).getNumericCellValue() / totalWeightFull);
+
+                CellStyle percentStyle = workbook.createCellStyle();
+                percentStyle.setDataFormat(workbook.createDataFormat().getFormat("0.00%"));
+                percentCell.setCellStyle(percentStyle);
+            }
+        }
         FileOutputStream fos = new FileOutputStream(file);
 
         workbook.write(fos);
@@ -237,4 +295,3 @@ public class CellsCounter {
         System.out.println("Работа программы завершена без ошибок.");
     }
 }
-
