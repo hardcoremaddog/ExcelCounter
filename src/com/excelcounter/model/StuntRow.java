@@ -2,42 +2,15 @@ package com.excelcounter.model;
 
 public class StuntRow {
 
-    private String countryOrigin;
-    private String countryImport;
-    private String product;
-    private String viewOfProduct;
+    private String name;
     private double cargoTotalWeight;
 
-    public String getCountryOrigin() {
-        return countryOrigin;
+    public String getName() {
+        return name;
     }
 
-    public void setCountryOrigin(String countryOrigin) {
-        this.countryOrigin = countryOrigin;
-    }
-
-    public String getCountryImport() {
-        return countryImport;
-    }
-
-    public void setCountryImport(String countryImport) {
-        this.countryImport = countryImport;
-    }
-
-    public String getProduct() {
-        return product;
-    }
-
-    public void setProduct(String product) {
-        this.product = product;
-    }
-
-    public String getViewOfProduct() {
-        return viewOfProduct;
-    }
-
-    public void setViewOfProduct(String viewOfProduct) {
-        this.viewOfProduct = viewOfProduct;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public double getCargoTotalWeight() {

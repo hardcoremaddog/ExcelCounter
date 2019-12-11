@@ -22,7 +22,7 @@ public class GUI extends JFrame {
     public JProgressBar progressBar = new JProgressBar();
 
     GUI() {
-        super("FriendlyExcelJavaWorker " + Main.VERSION);
+        super("EasyXLCounter " + Main.VERSION);
         this.setBounds(100, 100, 400, 250);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
