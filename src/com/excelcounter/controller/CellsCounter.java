@@ -46,7 +46,7 @@ public class CellsCounter {
         FileInputStream fin = new FileInputStream(file);
         Workbook workbook = WorkbookFactory.create(fin);
         Sheet sheet = workbook.getSheetAt(0);
-        for (int i = 0; i < sheet.getLastRowNum(); i++) {
+        for (int i = 0; i < sheet.getLastRowNum() + 1; i++) {
             Row row = sheet.getRow(i);
 
             StuntRow stuntRow = new StuntRow();
@@ -87,7 +87,11 @@ public class CellsCounter {
             }
             if (countryTotalWeight > 0) {
                 countryNameCell.setCellValue(name);
-                totalWeighCell.setCellValue(countryTotalWeight / 1000);
+                if (gui.checkBox.isSelected()) {
+                    totalWeighCell.setCellValue(countryTotalWeight / 1000);
+                } else {
+                    totalWeighCell.setCellValue(countryTotalWeight);
+                }
             }
             rowIndex++;
         }

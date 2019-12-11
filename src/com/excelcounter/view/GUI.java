@@ -17,6 +17,8 @@ public class GUI extends JFrame {
     private JButton allFileChooserButton = new JButton("Выбрать .xlsx файл с данными");
     public JLabel allFilePathLabel = new JLabel();
 
+    public JCheckBox checkBox = new JCheckBox("Результат в тоннах");
+
     private JButton startWork = new JButton("ПОСЧИТАТЬ ДАННЫЕ");
 
     public JProgressBar progressBar = new JProgressBar();
@@ -27,7 +29,7 @@ public class GUI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Container container = this.getContentPane();
-        container.setLayout(new GridLayout(4, 1, 1, 1));
+        container.setLayout(new GridLayout(5, 1, 1, 1));
 
         container.add(allFileChooserButton);
         container.add(allFilePathLabel);
@@ -41,6 +43,10 @@ public class GUI extends JFrame {
         progressBar.setMaximum(100);
         container.add(progressBar);
         container.add(startWork);
+
+        checkBox.setEnabled(true);
+        checkBox.setSelected(true);
+        container.add(checkBox);
     }
 
     private void setXLSXFilter(JFileChooser fileChooser) {
