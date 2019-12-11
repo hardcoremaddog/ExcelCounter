@@ -42,10 +42,9 @@ public class CellsCounter {
     }
 
     private void readAndWriteStunt(File file) throws IOException {
+        //get data
         FileInputStream fin = new FileInputStream(file);
-
         Workbook workbook = WorkbookFactory.create(fin);
-
         Sheet sheet = workbook.getSheetAt(0);
         for (int i = 0; i < sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
@@ -57,13 +56,12 @@ public class CellsCounter {
 
             stuntRowsList.add(stuntRow);
         }
-
         workbook.setSheetName(workbook.getSheetIndex(workbook.getSheetAt(0)), "Данные");
 
 
+        //create sheetResult
         double totalWeightFull = 0;
         String sheetResultName = "Результат";
-
         Sheet sheetResult;
         if (workbook.getSheet(sheetResultName) != null) {
             sheetResult = workbook.getSheet(sheetResultName);
@@ -73,6 +71,8 @@ public class CellsCounter {
         sheetResult.setColumnWidth(0, 20000);
         sheetResult.setColumnWidth(1, 5000);
 
+
+        //count totalByUniqueName
         int rowIndex = 0;
         for (String name : namesUniqueList) {
             Row row = sheetResult.createRow(rowIndex);
@@ -92,8 +92,6 @@ public class CellsCounter {
             rowIndex++;
         }
 
-
-        //todo +2?
         for (int i = 0; i < namesUniqueList.size(); i++) {
             Row row = sheetResult.getRow(i);
 
@@ -103,18 +101,15 @@ public class CellsCounter {
                 e.printStackTrace();
             }
         }
-
         Row row = sheetResult.createRow(namesUniqueList.size() + 1);
         Cell totalCell = row.createCell(1);
-
         totalCell.setCellValue(totalWeightFull);
 
 
-        //todo count percent
+        //count %
         sheet = workbook.getSheet(sheetResultName);
         for (int j = 0; j < sheet.getLastRowNum(); j++) {
             Row row1 = sheet.getRow(j);
-
             if (row1 == null) continue;
 
             Cell totalNameCell = row.createCell(0);
@@ -126,8 +121,10 @@ public class CellsCounter {
             percentStyle.setDataFormat(workbook.createDataFormat().getFormat("0.00%"));
             percentCell.setCellStyle(percentStyle);
         }
-        FileOutputStream fos = new FileOutputStream(file);
 
+
+        //write result and say good bye
+        FileOutputStream fos = new FileOutputStream(file);
         workbook.write(fos);
         fos.close();
         fin.close();
