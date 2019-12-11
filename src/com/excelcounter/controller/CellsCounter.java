@@ -39,10 +39,6 @@ public class CellsCounter {
             gui.progressBar.setValue(100);
             gui.allFilePathLabel.setText("                                  (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ QUAS, WEX, EXORT!!");
         }
-
-        if (gui != null) {
-            gui.progressBar.setValue(100);
-        }
     }
 
     private void readAndWriteStunt(File file) throws IOException {
