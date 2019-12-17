@@ -50,7 +50,11 @@ public class CellsCounter {
             Row row = sheet.getRow(i);
 
             StuntRow stuntRow = new StuntRow();
-            stuntRow.setName(row.getCell(0).getStringCellValue());
+            try {
+                stuntRow.setName(row.getCell(0).getStringCellValue());
+            } catch (NullPointerException e) {
+                continue;
+            }
             namesUniqueList.add(row.getCell(0).getStringCellValue());
             stuntRow.setCargoTotalWeight(row.getCell(1).getNumericCellValue());
 

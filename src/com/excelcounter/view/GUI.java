@@ -1,6 +1,7 @@
 package com.excelcounter.view;
 
 import com.excelcounter.controller.CellsCounter;
+import com.excelcounter.utils.Utils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -66,11 +67,12 @@ public class GUI extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             progressBar.setValue(0);
-            JFileChooser allFileChooser = new JFileChooser();
+            JFileChooser allFileChooser = Utils.getFileChooser();
             allFileChooser.setMultiSelectionEnabled(false);
             setXLSXFilter(allFileChooser);
             int ret = allFileChooser.showDialog(null, "Выбрать файл книги с данными");
             if (ret == JFileChooser.APPROVE_OPTION) {
+                Utils.setLastDir(allFileChooser.getSelectedFile());
                 checkFile(allFileChooser);
                 all = allFileChooser.getSelectedFile();
                 allFilePathLabel.setText(" Выбран файл: " + all.getAbsolutePath());
