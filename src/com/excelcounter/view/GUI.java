@@ -1,15 +1,13 @@
 package com.excelcounter.view;
 
 import com.excelcounter.controller.CellsCounter;
-import com.excelcounter.utils.Utils;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public class GUI extends JFrame {
 
@@ -66,16 +64,29 @@ public class GUI extends JFrame {
     class allFileChooseButtonActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            progressBar.setValue(0);
-            JFileChooser allFileChooser = Utils.getFileChooser();
-            allFileChooser.setMultiSelectionEnabled(false);
-            setXLSXFilter(allFileChooser);
-            int ret = allFileChooser.showDialog(null, "Выбрать файл книги с данными");
-            if (ret == JFileChooser.APPROVE_OPTION) {
-                Utils.setLastDir(allFileChooser.getSelectedFile());
-                checkFile(allFileChooser);
-                all = allFileChooser.getSelectedFile();
-                allFilePathLabel.setText(" Выбран файл: " + all.getAbsolutePath());
+            File cfgDir = new File(new File(".").getAbsolutePath() + "lastPath.cfg");
+            JFileChooser allFileChooser = new JFileChooser();
+
+            try {
+                if (cfgDir.length() > 0) {
+                    BufferedReader br = new BufferedReader(new FileReader(cfgDir));
+                    allFileChooser = new JFileChooser(br.readLine());
+                }
+                progressBar.setValue(0);
+                allFilePathLabel.setText("                                                    Опять работать?");
+                allFileChooser.setMultiSelectionEnabled(false);
+                setXLSXFilter(allFileChooser);
+                int ret = allFileChooser.showDialog(null, "Выбрать файл книги с данными");
+                if (ret == JFileChooser.APPROVE_OPTION) {
+                    checkFile(allFileChooser);
+                    all = allFileChooser.getSelectedFile();
+                    allFilePathLabel.setText(" Выбран файл: " + all.getAbsolutePath());
+                    FileWriter fileWriter = new FileWriter(cfgDir);
+                    fileWriter.write(all.getParent());
+                    fileWriter.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }
@@ -101,3 +112,4 @@ public class GUI extends JFrame {
         }
     }
 }
+
