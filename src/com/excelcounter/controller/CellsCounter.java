@@ -443,10 +443,10 @@ public class CellsCounter {
         try (XSSFWorkbook workbook = new XSSFWorkbook(new FileInputStream(file))) {
             XSSFSheet sheet = workbook.getSheetAt(0);
 
-            for (int i = 0; i < sheet.getPhysicalNumberOfRows(); i++) {
+            for (int i = 0; i < sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
 
-                for (int j = 0; j < row.getPhysicalNumberOfCells(); j++) {
+                for (int j = 0; j < row.getLastCellNum(); j++) {
                     Cell cell = row.getCell(j);
 
                     XSSFCellStyle cs = (XSSFCellStyle) cell.getCellStyle();
@@ -499,7 +499,7 @@ public class CellsCounter {
         for (int i = rowStart; i < sheet.getPhysicalNumberOfRows(); i++) {
 
             Cell dseVendorCell = sheet.getRow(i).getCell(0);
-            Cell dseNomenclatureCell = sheet.getRow(i).getCell(3);
+            Cell dseNomenclatureCell = sheet.getRow(i).getCell(6);
 
             XSSFCellStyle cs = (XSSFCellStyle) dseVendorCell.getCellStyle();
             XSSFFont font = cs.getFont();
