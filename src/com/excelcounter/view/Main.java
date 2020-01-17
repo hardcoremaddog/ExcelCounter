@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Main {
     //	private static File all;
     //	private static File table;
-    public static final String VERSION = "v0.7a";
+    public static final String VERSION = "v0.9a";
 
     public static void main(String[] args) throws IOException {
         try {
