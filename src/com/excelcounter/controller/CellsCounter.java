@@ -773,90 +773,94 @@ public class CellsCounter {
                     if (orderCell.getCellType() == CellType.STRING
                             && orderCell.getStringCellValue().trim().equals(order.getName().trim())) {
                         for (Department department : order.getDepartments()) {
-                            switch (department.getName()) {
-                                case UVK: {
-                                    row.getCell(2).setCellValue(department.getYellowCellsCount());
-                                    row.getCell(6).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case OMO: {
-                                    row.getCell(3).setCellValue(department.getYellowCellsCount());
-                                    row.getCell(7).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case OMZK:
-                                case OMZK_new:
-                                case OMZK_new2: {
-                                    row.getCell(4).setCellValue(department.getYellowCellsCount());
-                                    row.getCell(8).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case TSEH_5: {
-                                    row.getCell(10).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case TSEH_10: {
-                                    row.getCell(11).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case TSEH_51: {
-                                    row.getCell(12).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case TSEH_121: {
-                                    row.getCell(13).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case TSEH_217: {
-                                    row.getCell(14).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case TSEH_317: {
-                                    row.getCell(15).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case TSEH_416: {
-                                    row.getCell(16).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case TSEH_517: {
-                                    row.getCell(17).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                case VVMMZ: {
-                                    row.getCell(18).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
-                                //TODO add radio button SPB and realise method for it
-                                case ELMASH: {
-                                    row.getCell(20).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
+                            try {
+                                switch (department.getName()) {
+                                    case UVK: {
+                                        row.getCell(2).setCellValue(department.getYellowCellsCount());
+                                        row.getCell(6).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case OMO: {
+                                        row.getCell(3).setCellValue(department.getYellowCellsCount());
+                                        row.getCell(7).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case OMZK:
+                                    case OMZK_new:
+                                    case OMZK_new2: {
+                                        row.getCell(4).setCellValue(department.getYellowCellsCount());
+                                        row.getCell(8).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case TSEH_5: {
+                                        row.getCell(10).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case TSEH_10: {
+                                        row.getCell(11).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case TSEH_51: {
+                                        row.getCell(12).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case TSEH_121: {
+                                        row.getCell(13).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case TSEH_217: {
+                                        row.getCell(14).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case TSEH_317: {
+                                        row.getCell(15).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case TSEH_416: {
+                                        row.getCell(16).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case TSEH_517: {
+                                        row.getCell(17).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    case VVMMZ: {
+                                        row.getCell(18).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
+                                    //TODO add radio button SPB and realise method for it
+                                    case ELMASH: {
+                                        row.getCell(20).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
 
-                                case TSEH_SB_VAG: {
-                                    row.getCell(21).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
+                                    case TSEH_SB_VAG: {
+                                        row.getCell(21).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
 
-                                case UCH_SB_TEL: {
-                                    row.getCell(22).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
+                                    case UCH_SB_TEL: {
+                                        row.getCell(22).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
 
-                                case KOMPL_TSEH: {
-                                    row.getCell(23).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
+                                    case KOMPL_TSEH: {
+                                        row.getCell(23).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
 
-                                case UCH_MEH_OBR: {
-                                    row.getCell(24).setCellValue(department.getRedCellsCount());
-                                    break;
-                                }
+                                    case UCH_MEH_OBR: {
+                                        row.getCell(24).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
 
-                                case UCH_OKR_VAG: {
-                                    row.getCell(25).setCellValue(department.getRedCellsCount());
-                                    break;
+                                    case UCH_OKR_VAG: {
+                                        row.getCell(25).setCellValue(department.getRedCellsCount());
+                                        break;
+                                    }
                                 }
+                            } catch (NullPointerException e) {
+                                //it's probably SPB, go ahead
                             }
                         }
                     }
