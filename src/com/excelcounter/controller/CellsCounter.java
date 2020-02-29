@@ -657,7 +657,7 @@ public class CellsCounter {
         try (XSSFWorkbook sbytWorkBook = new XSSFWorkbook(new FileInputStream(sbyt))) {
             XSSFSheet sbytSheet = sbytWorkBook.getSheetAt(0);
 
-            for (int i = 3; i < sbytSheet.getPhysicalNumberOfRows(); i++) {
+            for (int i = 3; i < sbytSheet.getLastRowNum(); i++) {
                 Row row = sbytSheet.getRow(i);
                 Cell cell = row.getCell(0);
 
@@ -670,7 +670,8 @@ public class CellsCounter {
 
                     final String blueARGBHex = "FFC6E2FF";
                     if (cs.getFillForegroundColorColor().getARGBHex().equals(blueARGBHex)) {
-                        String orderNumber = cell.getStringCellValue().substring(0, cell.getStringCellValue().lastIndexOf(',')).trim();
+                        String fullOrderNumber = cell.getStringCellValue();
+                        String orderNumber = fullOrderNumber.substring(fullOrderNumber.indexOf('№') + 1, fullOrderNumber.lastIndexOf(',')).trim();
                         OrderSbyt orderSbyt = new OrderSbyt(orderNumber);
                         countSbyt(i + 1, sbytSheet, orderSbyt);
                         ordersSbyt.add(orderSbyt);
