@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -212,11 +213,14 @@ public class CellsCounter {
                     filePrefix = "753";
                 }
 
-                File directory = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\Результаты подсчета повторений\\" + username);
+//                File directory = new File("Z:\\Общая для МВМ\\!ПДУ_ОД\\Результаты подсчета повторений\\" + username);
+                //TODO Lepskaya
+                File directory = new File("C:\\Результаты подсчета повторений\\" + username);
                 File resultFile = new File(directory.toPath() + "\\" + filePrefix + "RepeatCountResult.xlsx");
                 try {
                     writeResultIntoRepeatCountTable(directory, resultFile);
                 } catch (IOException e) {
+                    System.out.println("Не удается записать файл.");
                     e.printStackTrace();
                 }
                 System.out.println("\nГотово!");
@@ -499,7 +503,7 @@ public class CellsCounter {
         for (int i = rowStart; i < sheet.getPhysicalNumberOfRows(); i++) {
 
             Cell dseVendorCell = sheet.getRow(i).getCell(0);
-            Cell dseNomenclatureCell = sheet.getRow(i).getCell(6);
+            Cell dseNomenclatureCell = sheet.getRow(i).getCell(3);
 
             XSSFCellStyle cs = (XSSFCellStyle) dseVendorCell.getCellStyle();
             XSSFFont font = cs.getFont();
